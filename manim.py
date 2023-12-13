@@ -76,61 +76,6 @@ class PlotParabola(Scene):
         derivative.shift(LEFT*shiftFactor)
         return derivative
     
-    def partialSlope1(self, coordinates, intercept, slope, next_to, direction):
-        derivativeSlope = r"\dfrac{\partial RSS}{\partial slope}  & = -2 \sum_{i=1}^{n} x_i(y_i - \hat{y}_i) \\ &"
-        derivativeSlope = MathTex(rf"{derivativeSlope}")
-        derivativeSlope.next_to(next_to, direction)
-        # move a bit to left
-        derivativeSlope.shift(UP*2)
-        derivativeSlope.shift(LEFT)
-        return derivativeSlope
-    
-    def partialSlope2(self, coordinates, intercept, slope, next_to, direction):
-        derivativeSlope = r"&"
-        for cords in coordinates:
-            if cords == coordinates[0]:
-                derivativeSlope += r"="
-            x, y = cords
-            derivativeSlope += rf"(-2) \cdot {x} \cdot ({intercept} + {slope} \cdot {x}) \\ & +"
-        # Remove last plus sign
-        derivativeSlope = derivativeSlope[:-1]
-        derivativeSlope = MathTex(rf"{derivativeSlope}")
-        derivativeSlope.next_to(next_to, direction)
-        # move a bit to left
-        derivativeSlope.shift(RIGHT*1.5)
-        return derivativeSlope
-    
-    def partialSlope3(self, coordinates, intercept, slope, next_to, direction):
-        derivativeSlope = r"&"
-        for cords in coordinates:
-            if cords == coordinates[0]:
-                derivativeSlope += r"="
-            x, y = cords
-            result = (-2) * x *intercept + slope * x 
-            derivativeSlope = derivativeSlope + rf"{result} +"
-        # Remove last plus sign
-        derivativeSlope = derivativeSlope[:-1]
-        derivativeSlope = MathTex(rf"{derivativeSlope}")
-        derivativeSlope.next_to(next_to, direction)
-        # move a bit to left
-        derivativeSlope.shift(RIGHT*0.65)
-        return derivativeSlope
-    def partialSlope4(self, coordinates, intercept, slope, next_to, direction):
-        totalResult = 0
-        derivativeSlope = r"&"
-        for cords in coordinates:
-            if cords == coordinates[0]:
-                derivativeSlope += r"="
-            x, y = cords
-            totalResult += (-2) * x *intercept + slope * x 
-        derivativeSlope = derivativeSlope + rf"{totalResult}"
-        derivativeSlope = MathTex(rf"{derivativeSlope}")
-        derivativeSlope.next_to(next_to, direction)
-        # move a bit to left
-        derivativeSlope.shift(LEFT*0.6)
-        return derivativeSlope
-        
-
 
 
     def graph(self, axes, formula, title=""):
