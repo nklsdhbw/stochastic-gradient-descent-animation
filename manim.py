@@ -9,7 +9,7 @@ class Visualize(Scene):
             derivative.next_to(next_to, direction)
             # move a bit to left
             derivative.shift(UP*2)
-            derivative.shift(LEFT)
+            derivative.shift(LEFT*0.7)
         elif wrt == "intercept":
             derivative = r"\dfrac{\partial RSS}{\partial intercept}  = -2 \sum_{i=1}^{n} (y_i - \hat{y}_i) \\ &"
             derivative = MathTex(rf"{derivative}")
@@ -185,10 +185,10 @@ class Visualize(Scene):
         partialSlopeText2 = self.partialDerivative2("slope", coordinates, 0, slope, partialSlopeText1, DOWN, 1.5)
         self.play(FadeIn(partialSlopeText2))
         self.wait(3)
-        partialSlopeText3 = self.partialDerivative3("slope", coordinates, 0, slope, partialSlopeText1, DOWN, 0.65)
+        partialSlopeText3 = self.partialDerivative3("slope", coordinates, 0, slope, partialSlopeText1, DOWN, 1.1)
         self.play(FadeTransform(partialSlopeText2, partialSlopeText3))
         self.wait(3)
-        partialSlopeText4 = self.partialDerivative4("slope", coordinates, 0, slope, partialSlopeText1, DOWN, 0.6)
+        partialSlopeText4 = self.partialDerivative4("slope", coordinates, 0, slope, partialSlopeText1, DOWN, 0.3)
         self.play(FadeTransform(partialSlopeText3, partialSlopeText4))
         self.wait(3)
 
@@ -198,10 +198,10 @@ class Visualize(Scene):
         partialInterceptText2 = self.partialDerivative2("intercept", coordinates, 0, slope, partialInterceptText1, DOWN, 1.7)
         self.play(FadeIn(partialInterceptText2))
         self.wait(3)
-        partialInterceptText3 = self.partialDerivative3("intercept", coordinates, 0, slope, partialInterceptText1, DOWN, 1.35)
+        partialInterceptText3 = self.partialDerivative3("intercept", coordinates, 0, slope, partialInterceptText1, DOWN, 1.4)
         self.play(FadeTransform(partialInterceptText2, partialInterceptText3))
         self.wait(3)
-        partialInterceptText4 = self.partialDerivative4("intercept", coordinates, 0, slope, partialInterceptText1, DOWN, -0.1)
+        partialInterceptText4 = self.partialDerivative4("intercept", coordinates, 0, slope, partialInterceptText1, DOWN, -0.3)
         self.play(FadeTransform(partialInterceptText3, partialInterceptText4))
         self.wait(3)
         
