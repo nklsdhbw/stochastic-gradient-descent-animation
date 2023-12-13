@@ -2,6 +2,7 @@ from manim import Create, Write, FadeIn, Axes, UP, Tex, WHITE, GREEN, Scene, Dot
 import sympy as sp
 
 class Visualize(Scene):
+    ####* Functions
     def partialDerivative1(self,wrt, coordinates, intercept, slope, next_to, direction):
         if wrt == "slope":
             derivative = r"\dfrac{\partial RSS}{\partial slope}  & = -2 \sum_{i=1}^{n} x_i(y_i - \hat{y}_i) \\ &"
@@ -92,7 +93,14 @@ class Visualize(Scene):
         dot = Dot(axes.c2p(x, y), color=RED)
         return dot
 
+    ####* Construct
     def construct(self):
+        title = Tex("Gradient Descent")
+        self.play(Write(title))
+        self.wait(2)
+        self.play(FadeOut(title))
+        self.wait(2)
+
         # Create axes
         axes = Axes(
             x_range=[0, 5],
@@ -135,6 +143,8 @@ class Visualize(Scene):
         function = MathTex("y = slope \cdot x + intercept")
         function2 = MathTex("= 1.5 \cdot x + 0")
         function.next_to(axes, RIGHT)
+        function.shift(UP*2)
+        function.shift(LEFT*0.7)
         function2.next_to(function, DOWN)
         function2.shift(LEFT*0.9)
         self.play(FadeIn(function))
@@ -173,7 +183,9 @@ class Visualize(Scene):
 
         # Residuals sum of squares
         RSS = Tex("$RSS = \sum_{i=1}^{n} (y_i - \hat{y}_i)^2$")
-        RSS.next_to(linetitle, RIGHT)
+        RSS.next_to(axes, RIGHT)
+        RSS.shift(UP*2)
+        RSS.shift(LEFT*0.7)
         self.play(FadeIn(RSS))
         self.wait(2)
         self.play(FadeOut(RSS))
@@ -204,5 +216,8 @@ class Visualize(Scene):
         partialInterceptText4 = self.partialDerivative4("intercept", coordinates, 0, slope, partialInterceptText1, DOWN, -0.3)
         self.play(FadeTransform(partialInterceptText3, partialInterceptText4))
         self.wait(3)
+
+
+        # Visualize 
         
         
