@@ -1,12 +1,143 @@
-from manim import Create, Write, FadeIn, Axes, UP, Tex, WHITE, GREEN, Scene, Dot, DashedLine, YELLOW, RED, BLUE, DOWN
+from manim import Create, Write, FadeIn, Axes, UP, Tex, WHITE, GREEN, Scene, Dot, DashedLine, YELLOW, RED, BLUE, DOWN, LEFT, VGroup, RIGHT, FadeOut, MathTex, Transform, FadeTransform
 import sympy as sp
 
 class PlotParabola(Scene):
+    def partialDerivative1(self,wrt, coordinates, intercept, slope, next_to, direction):
+        if wrt == "slope":
+            derivative = r"\dfrac{\partial RSS}{\partial slope}  & = -2 \sum_{i=1}^{n} x_i(y_i - \hat{y}_i) \\ &"
+            derivative = MathTex(rf"{derivative}")
+            derivative.next_to(next_to, direction)
+            # move a bit to left
+            derivative.shift(UP*2)
+            derivative.shift(LEFT)
+        elif wrt == "intercept":
+            derivative = r"\dfrac{\partial RSS}{\partial intercept}  = -2 \sum_{i=1}^{n} (y_i - \hat{y}_i) \\ &"
+            derivative = MathTex(rf"{derivative}")
+            derivative.next_to(next_to, direction)
+
+        return derivative
+    
+    def partialDerivative2(self, wrt, coordinates, intercept, slope, next_to, direction, shiftFactor):
+        derivative = r"&"
+        for cords in coordinates:
+            if cords == coordinates[0]:
+                derivative += r"="
+            x, y = cords
+            if wrt == "slope":
+                derivative += rf"(-2) \cdot {x} \cdot ({intercept} + {slope} \cdot {x}) \\ & +"
+            elif wrt == "intercept":
+                derivative += rf"(-2) \cdot ({intercept} + {slope} \cdot {x}) \\ & +"
+        # Remove last plus sign
+        derivative = derivative[:-1]
+        
+        derivative = MathTex(rf"{derivative}")
+        derivative.next_to(next_to, direction)
+        # move a bit to left
+        derivative.shift(RIGHT*shiftFactor)
+        return derivative
+    
+    def partialDerivative3(self, wrt, coordinates, intercept, slope, next_to, direction, shiftFactor):
+        derivative = r"&"
+        for cords in coordinates:
+            if cords == coordinates[0]:
+                derivative += r"="
+            x, y = cords
+            if wrt == "slope":
+                result = (-2) * x * (intercept + slope * x)
+            elif wrt == "intercept":
+                result = (-2) * (intercept + slope * x)
+            derivative = derivative + rf"{result} +"
+        # Remove last plus sign
+        derivative = derivative[:-1]
+         # replace +- with -
+        derivative = derivative.replace("+-", "-")
+        print(derivative)
+        derivative = MathTex(rf"{derivative}")
+        derivative.next_to(next_to, direction)
+        # move a bit to left
+        derivative.shift(RIGHT*shiftFactor)
+        return derivative
+    
+    def partialDerivative4(self, wrt, coordinates, intercept, slope, next_to, direction, shiftFactor):
+        totalResult = 0
+        derivative = r"&"
+        for cords in coordinates:
+            if cords == coordinates[0]:
+                derivative += r"="
+            x, y = cords
+            if wrt == "slope":
+                totalResult += (-2) * x * (intercept + slope * x)
+            elif wrt == "intercept":
+                totalResult += (-2) * (intercept + slope * x)
+        derivative = derivative + rf"{totalResult}"
+        derivative = MathTex(rf"{derivative}")
+        derivative.next_to(next_to, direction)
+        # move a bit to left
+        derivative.shift(LEFT*shiftFactor)
+        return derivative
+    
+    def partialSlope1(self, coordinates, intercept, slope, next_to, direction):
+        derivativeSlope = r"\dfrac{\partial RSS}{\partial slope}  & = -2 \sum_{i=1}^{n} x_i(y_i - \hat{y}_i) \\ &"
+        derivativeSlope = MathTex(rf"{derivativeSlope}")
+        derivativeSlope.next_to(next_to, direction)
+        # move a bit to left
+        derivativeSlope.shift(UP*2)
+        derivativeSlope.shift(LEFT)
+        return derivativeSlope
+    
+    def partialSlope2(self, coordinates, intercept, slope, next_to, direction):
+        derivativeSlope = r"&"
+        for cords in coordinates:
+            if cords == coordinates[0]:
+                derivativeSlope += r"="
+            x, y = cords
+            derivativeSlope += rf"(-2) \cdot {x} \cdot ({intercept} + {slope} \cdot {x}) \\ & +"
+        # Remove last plus sign
+        derivativeSlope = derivativeSlope[:-1]
+        derivativeSlope = MathTex(rf"{derivativeSlope}")
+        derivativeSlope.next_to(next_to, direction)
+        # move a bit to left
+        derivativeSlope.shift(RIGHT*1.5)
+        return derivativeSlope
+    
+    def partialSlope3(self, coordinates, intercept, slope, next_to, direction):
+        derivativeSlope = r"&"
+        for cords in coordinates:
+            if cords == coordinates[0]:
+                derivativeSlope += r"="
+            x, y = cords
+            result = (-2) * x *intercept + slope * x 
+            derivativeSlope = derivativeSlope + rf"{result} +"
+        # Remove last plus sign
+        derivativeSlope = derivativeSlope[:-1]
+        derivativeSlope = MathTex(rf"{derivativeSlope}")
+        derivativeSlope.next_to(next_to, direction)
+        # move a bit to left
+        derivativeSlope.shift(RIGHT*0.65)
+        return derivativeSlope
+    def partialSlope4(self, coordinates, intercept, slope, next_to, direction):
+        totalResult = 0
+        derivativeSlope = r"&"
+        for cords in coordinates:
+            if cords == coordinates[0]:
+                derivativeSlope += r"="
+            x, y = cords
+            totalResult += (-2) * x *intercept + slope * x 
+        derivativeSlope = derivativeSlope + rf"{totalResult}"
+        derivativeSlope = MathTex(rf"{derivativeSlope}")
+        derivativeSlope.next_to(next_to, direction)
+        # move a bit to left
+        derivativeSlope.shift(LEFT*0.6)
+        return derivativeSlope
+        
+
+
+
     def graph(self, axes, formula, title=""):
         x = sp.symbols('x')
         formula = sp.sympify(formula)
         function = sp.lambdify(x, formula, 'numpy')
-        graph = axes.plot(function, color=BLUE)
+        graph = axes.plot(function, x_range=[0, 3.1],color=BLUE)
 
         title = Tex(title)
         title.next_to(axes, UP)
@@ -19,8 +150,8 @@ class PlotParabola(Scene):
     def construct(self):
         # Create axes
         axes = Axes(
-            x_range=[0, 4],
-            y_range=[0, 4],
+            x_range=[0, 5],
+            y_range=[0, 5],
             axis_config={"color": WHITE,},
             x_length = 6,
             y_length = 6,
@@ -37,9 +168,36 @@ class PlotParabola(Scene):
             dots.append(self.dot(axes, x, y))
         
 
+
+        # Show coordinate system and dots
+        self.play(Create(axes), Write(x_label), Write(y_label))
+        for dot in dots:
+            self.play(FadeIn(dot))
+        self.wait(2)
+
+
+        # Move coordinate system to the left all at the same time
+        group = VGroup(axes, x_label, y_label, *dots)
+        self.play(group.animate.shift(LEFT*3))
+        self.wait(3)
+
+
         # Create regression line
         slope = 1.5
         line, linetitle = self.graph(axes, f"{slope}*x")
+
+        function = Tex("$y = slope \cdot x + intercept$")
+        function2 = Tex("$y = 1.5 \cdot x + 0$")
+        function.next_to(axes, RIGHT)
+        function2.next_to(function, DOWN)
+        self.play(FadeIn(function))
+        self.play(FadeIn(function2))
+        # Show regression line
+        self.wait(3)
+        self.play(FadeIn(line), FadeIn(linetitle))
+
+
+
 
         # Create orthogonal lines
         perpendicular_slope = -1 / slope
@@ -56,28 +214,62 @@ class PlotParabola(Scene):
             new_dot = self.dot(axes, x_value, y_value)
             newDots[dot_obj] = new_dot
 
-        # draw line from dot to first dot of newDots and then to second dot of newDots
+        # Draw loss function lines
         connections = {}
         for dot_obj, new_dot in newDots.items():
             connections[dot_obj] = DashedLine(dot_obj.get_center(), new_dot.get_center(), color=RED)
 
-        
-
-
-        # Show axes and the parabola curve
-        self.play(Create(axes), Write(x_label), Write(y_label))
-        for dot in dots:
-            self.play(FadeIn(dot))
-        #self.play(FadeIn(dot), FadeIn(dot2), FadeIn(dot3))
-        self.play(FadeIn(line), FadeIn(linetitle))
         for connection in connections.values():
             self.play(FadeIn(connection))
-
+        
+        self.play(FadeOut(function), FadeOut(function2))
 
         # Residuals sum of squares
         RSS = Tex("$RSS = \sum_{i=1}^{n} (y_i - \hat{y}_i)^2$")
-        RSS.next_to(linetitle, DOWN)
+        RSS.next_to(linetitle, RIGHT)
         self.play(FadeIn(RSS))
+        self.wait(2)
+        self.play(FadeOut(RSS))
 
+        # Derivative of RSS
+        
+        #self.play(FadeIn(derivativeSlope))
+        """
+        self.wait(2)
+        partialSlopeText1 = self.partialSlope1(coordinates, 0, slope, axes, RIGHT)
+        self.play(FadeIn(partialSlopeText1))
+        partialSlopeText2 = self.partialSlope2(coordinates, 0, slope, partialSlopeText1, DOWN)
+        self.play(FadeIn(partialSlopeText2))
+        partialSlopeText3 = self.partialSlope3(coordinates, 0, slope, partialSlopeText1, DOWN)
+        self.play(FadeTransform(partialSlopeText2, partialSlopeText3))
+        partialSlopeText4 = self.partialSlope4(coordinates, 0, slope, partialSlopeText1, DOWN)
+        self.play(FadeTransform(partialSlopeText3, partialSlopeText4))
+        """
+        partialSlopeText1 = self.partialDerivative1("slope", coordinates, 0, slope, axes, RIGHT)
+        self.play(FadeIn(partialSlopeText1))
+        partialSlopeText2 = self.partialDerivative2("slope", coordinates, 0, slope, partialSlopeText1, DOWN, 1.5)
+        self.play(FadeIn(partialSlopeText2))
+        partialSlopeText3 = self.partialDerivative3("slope", coordinates, 0, slope, partialSlopeText1, DOWN, 0.65)
+        self.play(FadeTransform(partialSlopeText2, partialSlopeText3))
+        partialSlopeText4 = self.partialDerivative4("slope", coordinates, 0, slope, partialSlopeText1, DOWN, 0.6)
+        self.play(FadeTransform(partialSlopeText3, partialSlopeText4))
+        self.wait(2)
+
+        partialInterceptText1 = self.partialDerivative1("intercept", coordinates, 0, slope, partialSlopeText4, DOWN)
+        self.play(FadeIn(partialInterceptText1))
+        partialInterceptText2 = self.partialDerivative2("intercept", coordinates, 0, slope, partialInterceptText1, DOWN, 1.7)
+        self.play(FadeIn(partialInterceptText2))
+        partialInterceptText3 = self.partialDerivative3("intercept", coordinates, 0, slope, partialInterceptText1, DOWN, 1.35)
+        self.play(FadeTransform(partialInterceptText2, partialInterceptText3))
+        partialInterceptText4 = self.partialDerivative4("intercept", coordinates, 0, slope, partialInterceptText1, DOWN, -0.1)
+        self.play(FadeTransform(partialInterceptText3, partialInterceptText4))
+        self.wait(2)
+
+        #derivativeIntercept = MathTex(r"\dfrac{\partial RSS}{\partial intercept}  = -2 \sum_{i=1}^{n} (y_i - \hat{y}_i)")
+        #derivativeSlope.next_to(axes, RIGHT)
+        #derivativeIntercept.next_to(derivativeSlope, DOWN)
+        
+        
+        
         self.wait(3)
 
