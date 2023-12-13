@@ -1,4 +1,4 @@
-from manim import Create, Write, FadeIn, Axes, UP, Tex, WHITE, GREEN, Scene, Dot, DashedLine, YELLOW, RED, BLUE
+from manim import Create, Write, FadeIn, Axes, UP, Tex, WHITE, GREEN, Scene, Dot, DashedLine, YELLOW, RED, BLUE, DOWN
 import sympy as sp
 
 class PlotParabola(Scene):
@@ -19,9 +19,11 @@ class PlotParabola(Scene):
     def construct(self):
         # Create axes
         axes = Axes(
-            x_range=[-4, 4],
-            y_range=[-4, 4],
+            x_range=[0, 4],
+            y_range=[0, 4],
             axis_config={"color": WHITE,},
+            x_length = 6,
+            y_length = 6,
             
         )
         # Add labels to the axes
@@ -29,10 +31,11 @@ class PlotParabola(Scene):
         y_label = axes.get_y_axis_label("y")
 
         # Create a dots
-        dot = self.dot(axes, 1, 2)
-        dot2 = self.dot(axes, 2, 4)
-        dot3 = self.dot(axes, 2.5, 3)
-        dots = [dot, dot2, dot3]
+        dots = []
+        coordinates = [(1, 2), (2, 4), (2.5, 3)]
+        for x, y in coordinates:
+            dots.append(self.dot(axes, x, y))
+        
 
         # Create regression line
         slope = 1.5
@@ -41,10 +44,9 @@ class PlotParabola(Scene):
         # Create orthogonal lines
         perpendicular_slope = -1 / slope
         newDots = {}
-        for dot_obj in [dot, dot2, dot3]:
+        for dot_obj, cords in zip(dots, coordinates):
             # y = mx + b
-            x = dot_obj.get_center()[0]
-            y = dot_obj.get_center()[1]
+            x, y = cords
             b = y - x*(perpendicular_slope)
             
             m1, b1 = (slope, 0)
@@ -53,7 +55,6 @@ class PlotParabola(Scene):
             y_value = m2 * x_value + b2
             new_dot = self.dot(axes, x_value, y_value)
             newDots[dot_obj] = new_dot
-            print("Dot: ", x_value, y_value)
 
         # draw line from dot to first dot of newDots and then to second dot of newDots
         connections = {}
@@ -65,11 +66,18 @@ class PlotParabola(Scene):
 
         # Show axes and the parabola curve
         self.play(Create(axes), Write(x_label), Write(y_label))
-        self.play(FadeIn(dot), FadeIn(dot2), FadeIn(dot3))
+        for dot in dots:
+            self.play(FadeIn(dot))
+        #self.play(FadeIn(dot), FadeIn(dot2), FadeIn(dot3))
         self.play(FadeIn(line), FadeIn(linetitle))
         for connection in connections.values():
             self.play(FadeIn(connection))
 
+
+        # Residuals sum of squares
+        RSS = Tex("$RSS = \sum_{i=1}^{n} (y_i - \hat{y}_i)^2$")
+        RSS.next_to(linetitle, DOWN)
+        self.play(FadeIn(RSS))
 
         self.wait(3)
 
