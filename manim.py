@@ -1,7 +1,7 @@
 from manim import Create, Write, FadeIn, Axes, UP, Tex, WHITE, GREEN, Scene, Dot, DashedLine, YELLOW, RED, BLUE, DOWN, LEFT, VGroup, RIGHT, FadeOut, MathTex, Transform, FadeTransform
 import sympy as sp
 
-class PlotParabola(Scene):
+class Visualize(Scene):
     def partialDerivative1(self,wrt, coordinates, intercept, slope, next_to, direction):
         if wrt == "slope":
             derivative = r"\dfrac{\partial RSS}{\partial slope}  & = -2 \sum_{i=1}^{n} x_i(y_i - \hat{y}_i) \\ &"
@@ -89,7 +89,7 @@ class PlotParabola(Scene):
         return graph, title
     
     def dot(self, axes, x, y):
-        dot = Dot(axes.c2p(x, y))
+        dot = Dot(axes.c2p(x, y), color=RED)
         return dot
 
     def construct(self):
@@ -116,6 +116,7 @@ class PlotParabola(Scene):
 
         # Show coordinate system and dots
         self.play(Create(axes), Write(x_label), Write(y_label))
+        self.wait(2)
         for dot in dots:
             self.play(FadeIn(dot))
         self.wait(2)
@@ -131,10 +132,11 @@ class PlotParabola(Scene):
         slope = 1.5
         line, linetitle = self.graph(axes, f"{slope}*x")
 
-        function = Tex("$y = slope \cdot x + intercept$")
-        function2 = Tex("$y = 1.5 \cdot x + 0$")
+        function = MathTex("y = slope \cdot x + intercept")
+        function2 = MathTex("= 1.5 \cdot x + 0")
         function.next_to(axes, RIGHT)
         function2.next_to(function, DOWN)
+        function2.shift(LEFT*0.9)
         self.play(FadeIn(function))
         self.play(FadeIn(function2))
         # Show regression line
@@ -176,45 +178,31 @@ class PlotParabola(Scene):
         self.wait(2)
         self.play(FadeOut(RSS))
 
-        # Derivative of RSS
-        
-        #self.play(FadeIn(derivativeSlope))
-        """
-        self.wait(2)
-        partialSlopeText1 = self.partialSlope1(coordinates, 0, slope, axes, RIGHT)
-        self.play(FadeIn(partialSlopeText1))
-        partialSlopeText2 = self.partialSlope2(coordinates, 0, slope, partialSlopeText1, DOWN)
-        self.play(FadeIn(partialSlopeText2))
-        partialSlopeText3 = self.partialSlope3(coordinates, 0, slope, partialSlopeText1, DOWN)
-        self.play(FadeTransform(partialSlopeText2, partialSlopeText3))
-        partialSlopeText4 = self.partialSlope4(coordinates, 0, slope, partialSlopeText1, DOWN)
-        self.play(FadeTransform(partialSlopeText3, partialSlopeText4))
-        """
+        # Derivatives of RSS
         partialSlopeText1 = self.partialDerivative1("slope", coordinates, 0, slope, axes, RIGHT)
         self.play(FadeIn(partialSlopeText1))
+        self.wait(3)
         partialSlopeText2 = self.partialDerivative2("slope", coordinates, 0, slope, partialSlopeText1, DOWN, 1.5)
         self.play(FadeIn(partialSlopeText2))
+        self.wait(3)
         partialSlopeText3 = self.partialDerivative3("slope", coordinates, 0, slope, partialSlopeText1, DOWN, 0.65)
         self.play(FadeTransform(partialSlopeText2, partialSlopeText3))
+        self.wait(3)
         partialSlopeText4 = self.partialDerivative4("slope", coordinates, 0, slope, partialSlopeText1, DOWN, 0.6)
         self.play(FadeTransform(partialSlopeText3, partialSlopeText4))
-        self.wait(2)
+        self.wait(3)
 
         partialInterceptText1 = self.partialDerivative1("intercept", coordinates, 0, slope, partialSlopeText4, DOWN)
         self.play(FadeIn(partialInterceptText1))
+        self.wait(3)
         partialInterceptText2 = self.partialDerivative2("intercept", coordinates, 0, slope, partialInterceptText1, DOWN, 1.7)
         self.play(FadeIn(partialInterceptText2))
+        self.wait(3)
         partialInterceptText3 = self.partialDerivative3("intercept", coordinates, 0, slope, partialInterceptText1, DOWN, 1.35)
         self.play(FadeTransform(partialInterceptText2, partialInterceptText3))
+        self.wait(3)
         partialInterceptText4 = self.partialDerivative4("intercept", coordinates, 0, slope, partialInterceptText1, DOWN, -0.1)
         self.play(FadeTransform(partialInterceptText3, partialInterceptText4))
-        self.wait(2)
-
-        #derivativeIntercept = MathTex(r"\dfrac{\partial RSS}{\partial intercept}  = -2 \sum_{i=1}^{n} (y_i - \hat{y}_i)")
-        #derivativeSlope.next_to(axes, RIGHT)
-        #derivativeIntercept.next_to(derivativeSlope, DOWN)
-        
-        
-        
         self.wait(3)
-
+        
+        
