@@ -139,7 +139,7 @@ class Visualize(Scene):
         self.play(Create(axes), Write(x_label), Write(y_label))
         self.wait(2)
         for dot in dots:
-            self.play(FadeIn(dot))
+            self.play(Write(dot))
         self.wait(2)
 
 
@@ -160,11 +160,11 @@ class Visualize(Scene):
         function.shift(LEFT*0.7)
         function2.next_to(function, DOWN)
         function2.shift(LEFT*0.9)
-        self.play(FadeIn(function))
-        self.play(FadeIn(function2))
+        self.play(Write(function))
+        self.play(Write(function2))
         # Show regression line
         self.wait(3)
-        self.play(FadeIn(line), FadeIn(linetitle))
+        self.play(Write(line), Write(linetitle))
 
 
 
@@ -190,7 +190,7 @@ class Visualize(Scene):
             connections[dot_obj] = DashedLine(dot_obj.get_center(), new_dot.get_center(), color=RED)
 
         for connection in connections.values():
-            self.play(FadeIn(connection))
+            self.play(Write(connection))
         
         self.play(FadeOut(function), FadeOut(function2))
 
@@ -199,18 +199,18 @@ class Visualize(Scene):
         RSS.next_to(axes, RIGHT)
         RSS.shift(UP*2)
         RSS.shift(LEFT*0.7)
-        self.play(FadeIn(RSS))
+        self.play(Write(RSS))
         self.wait(2)
         self.play(FadeOut(RSS))
 
         # Derivatives of RSS
         partialSlopeText1 = self.partialDerivative1("slope", coordinates, 0, slope, axes, RIGHT)
-        self.play(FadeIn(partialSlopeText1))
-        self.wait(3)
         partialSlopeText2 = self.partialDerivative2("slope", coordinates, 0, slope, partialSlopeText1, RIGHT, 1.5)
-        self.play(FadeIn(partialSlopeText2))
+        self.play(Write(partialSlopeText1))
+        
+        self.play(Write(partialSlopeText2))
         partialSlopeText3 = self.partialDerivative3("slope", coordinates, 0, slope, partialSlopeText2, DOWN, 0.75)
-        self.play(FadeIn(partialSlopeText3))
+        self.play(Write(partialSlopeText3))
         self.wait(3)
         partialSlopeText4 = self.partialDerivative4("slope", coordinates, 0, slope, partialSlopeText1, DOWN, 3.3)
         self.play(FadeTransform(partialSlopeText3, partialSlopeText4))
@@ -222,12 +222,11 @@ class Visualize(Scene):
         self.wait(2)
 
         partialInterceptText1 = self.partialDerivative1("intercept", coordinates, 0, slope, partialSlopeText1, DOWN)
-        self.play(FadeIn(partialInterceptText1))
-        self.wait(3)
         partialInterceptText2 = self.partialDerivative2("slope", coordinates, 0, slope, partialInterceptText1, RIGHT, 1.5)
-        self.play(FadeIn(partialInterceptText2))
+        self.play(Write(partialInterceptText1))
+        self.play(Write(partialInterceptText2))
         partialInterceptText3 = self.partialDerivative3("intercept", coordinates, 0, slope, partialInterceptText2, DOWN, 0.25)
-        self.play(FadeIn(partialInterceptText3))
+        self.play(Write(partialInterceptText3))
         self.wait(3)
         partialInterceptText4 = self.partialDerivative4("intercept", coordinates, 0, slope, partialInterceptText1, DOWN, 3.4)
         self.play(FadeTransform(partialInterceptText3, partialInterceptText4))
