@@ -1,24 +1,37 @@
-from manim import Create, Write, FadeIn, Axes, UP, Tex, WHITE, GREEN, Scene, Dot, DashedLine, YELLOW, RED, BLUE, DOWN, LEFT, VGroup, RIGHT, FadeOut, MathTex, Transform, FadeTransform
+from manim import Create, Write, FadeIn, Axes, UP, Tex, WHITE, GREEN, Scene, Dot, DashedLine, YELLOW, RED, BLUE, DOWN, LEFT, VGroup, RIGHT, FadeOut, MathTex, Transform, FadeTransform, ReplacementTransform
 import sympy as sp
 
 class Visualize(Scene):
     ####* Functions
     def partialDerivative1(self,wrt, coordinates, intercept, slope, next_to, direction):
         if wrt == "slope":
-            derivative = r"\dfrac{\partial RSS}{\partial slope}  & = -2 \sum_{i=1}^{n} x_i(y_i - \hat{y}_i) \\ &"
+            derivative = r"\dfrac{\partial RSS}{\partial slope}"
             derivative = MathTex(rf"{derivative}")
             derivative.next_to(next_to, direction)
             # move a bit to left
             derivative.shift(UP*2)
             derivative.shift(LEFT*0.7)
         elif wrt == "intercept":
-            derivative = r"\dfrac{\partial RSS}{\partial intercept}  = -2 \sum_{i=1}^{n} (y_i - \hat{y}_i) \\ &"
+            derivative = r"\dfrac{\partial RSS}{\partial intercept}"
             derivative = MathTex(rf"{derivative}")
             derivative.next_to(next_to, direction)
+            derivative.shift(DOWN*1)
 
         return derivative
     
     def partialDerivative2(self, wrt, coordinates, intercept, slope, next_to, direction, shiftFactor):
+        if wrt == "slope":
+            derivative = r"& = -2 \sum_{i=1}^{n} x_i(y_i - \hat{y}_i) \\ &"
+            derivative = MathTex(rf"{derivative}")
+            derivative.next_to(next_to, direction)
+            # move a bit to left
+        elif wrt == "intercept":
+            derivative = r"\dfrac{\partial RSS}{\partial intercept}  = -2 \sum_{i=1}^{n} (y_i - \hat{y}_i) \\ &"
+            derivative = MathTex(rf"{derivative}")
+            derivative.next_to(next_to, direction)
+        return derivative
+
+    def partialDerivative3(self, wrt, coordinates, intercept, slope, next_to, direction, shiftFactor):
         derivative = r"&"
         for cords in coordinates:
             if cords == coordinates[0]:
@@ -37,7 +50,7 @@ class Visualize(Scene):
         derivative.shift(RIGHT*shiftFactor)
         return derivative
     
-    def partialDerivative3(self, wrt, coordinates, intercept, slope, next_to, direction, shiftFactor):
+    def partialDerivative4(self, wrt, coordinates, intercept, slope, next_to, direction, shiftFactor):
         derivative = r"&"
         for cords in coordinates:
             if cords == coordinates[0]:
@@ -59,7 +72,7 @@ class Visualize(Scene):
         derivative.shift(RIGHT*shiftFactor)
         return derivative
     
-    def partialDerivative4(self, wrt, coordinates, intercept, slope, next_to, direction, shiftFactor):
+    def partialDerivative5(self, wrt, coordinates, intercept, slope, next_to, direction, shiftFactor):
         totalResult = 0
         derivative = r"&"
         for cords in coordinates:
@@ -74,7 +87,7 @@ class Visualize(Scene):
         derivative = MathTex(rf"{derivative}")
         derivative.next_to(next_to, direction)
         # move a bit to left
-        derivative.shift(LEFT*shiftFactor)
+        derivative.shift(RIGHT*shiftFactor)
         return derivative
     
 
@@ -194,30 +207,57 @@ class Visualize(Scene):
         partialSlopeText1 = self.partialDerivative1("slope", coordinates, 0, slope, axes, RIGHT)
         self.play(FadeIn(partialSlopeText1))
         self.wait(3)
-        partialSlopeText2 = self.partialDerivative2("slope", coordinates, 0, slope, partialSlopeText1, DOWN, 1.5)
+        partialSlopeText2 = self.partialDerivative2("slope", coordinates, 0, slope, partialSlopeText1, RIGHT, 1.5)
         self.play(FadeIn(partialSlopeText2))
+        partialSlopeText3 = self.partialDerivative3("slope", coordinates, 0, slope, partialSlopeText2, DOWN, 0.75)
+        self.play(FadeIn(partialSlopeText3))
         self.wait(3)
-        partialSlopeText3 = self.partialDerivative3("slope", coordinates, 0, slope, partialSlopeText1, DOWN, 1.1)
-        self.play(FadeTransform(partialSlopeText2, partialSlopeText3))
-        self.wait(3)
-        partialSlopeText4 = self.partialDerivative4("slope", coordinates, 0, slope, partialSlopeText1, DOWN, 0.3)
+        partialSlopeText4 = self.partialDerivative4("slope", coordinates, 0, slope, partialSlopeText1, DOWN, 3.3)
         self.play(FadeTransform(partialSlopeText3, partialSlopeText4))
         self.wait(3)
+        partialSlopeText5 = self.partialDerivative5("slope", coordinates, 0, slope, partialSlopeText1, DOWN, 2)
+        self.play(FadeTransform(partialSlopeText4, partialSlopeText5))
+        self.wait(2)
+        self.play(FadeOut(partialSlopeText2), partialSlopeText5.animate.shift(UP))
+        self.wait(2)
 
-        partialInterceptText1 = self.partialDerivative1("intercept", coordinates, 0, slope, partialSlopeText4, DOWN)
+        partialInterceptText1 = self.partialDerivative1("intercept", coordinates, 0, slope, partialSlopeText1, DOWN)
         self.play(FadeIn(partialInterceptText1))
         self.wait(3)
-        partialInterceptText2 = self.partialDerivative2("intercept", coordinates, 0, slope, partialInterceptText1, DOWN, 1.7)
+        partialInterceptText2 = self.partialDerivative2("slope", coordinates, 0, slope, partialInterceptText1, RIGHT, 1.5)
         self.play(FadeIn(partialInterceptText2))
+        partialInterceptText3 = self.partialDerivative3("intercept", coordinates, 0, slope, partialInterceptText2, DOWN, 0.25)
+        self.play(FadeIn(partialInterceptText3))
         self.wait(3)
-        partialInterceptText3 = self.partialDerivative3("intercept", coordinates, 0, slope, partialInterceptText1, DOWN, 1.4)
-        self.play(FadeTransform(partialInterceptText2, partialInterceptText3))
-        self.wait(3)
-        partialInterceptText4 = self.partialDerivative4("intercept", coordinates, 0, slope, partialInterceptText1, DOWN, -0.3)
+        partialInterceptText4 = self.partialDerivative4("intercept", coordinates, 0, slope, partialInterceptText1, DOWN, 3.4)
         self.play(FadeTransform(partialInterceptText3, partialInterceptText4))
         self.wait(3)
+        partialInterceptText5 = self.partialDerivative5("intercept", coordinates, 0, slope, partialInterceptText1, DOWN, 2.3)
+        self.play(FadeTransform(partialInterceptText4, partialInterceptText5))
+        self.wait(2)
+        self.play(FadeOut(partialInterceptText2), partialInterceptText5.animate.shift(UP))
+        self.wait(2)
 
+        # clear up all objects
+        objects = [axes, x_label, y_label, *dots, *newDots.values(), *connections.values(), line, linetitle]
+        group = VGroup(*objects)
+        self.play(FadeOut(group))
+        self.wait(0.5)
+        derivatives = [partialSlopeText1, partialSlopeText5, partialInterceptText1, partialInterceptText5]
+        group = VGroup(*derivatives)
+        self.play(group.animate.shift(LEFT*6))
+        # Animate move group to left
 
-        # Visualize 
+        
+        # Gradient descent
+        # Visualize
+        """
+        stepSizeIntercept = r"stepSize_{intercept} = slope \cdot learningRate"
+        stepSizeIntercept = MathTex(rf"{stepSizeIntercept}")
+        stepSizeIntercept.next_to(partialInterceptText4, RIGHT)
+        stepSizeIntercept.shift(UP*2)
+        self.play(FadeIn(stepSizeIntercept))
+        """
+        
         
         
