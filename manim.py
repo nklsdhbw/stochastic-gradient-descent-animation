@@ -88,7 +88,7 @@ class Visualize(Scene):
         derivative.next_to(next_to, direction)
         # move a bit to left
         derivative.shift(RIGHT*shiftFactor)
-        return derivative
+        return derivative, totalResult
     
 
 
@@ -215,7 +215,7 @@ class Visualize(Scene):
         partialSlopeText4 = self.partialDerivative4("slope", coordinates, 0, slope, partialSlopeText1, DOWN, 3.3)
         self.play(FadeTransform(partialSlopeText3, partialSlopeText4))
         self.wait(3)
-        partialSlopeText5 = self.partialDerivative5("slope", coordinates, 0, slope, partialSlopeText1, DOWN, 2)
+        partialSlopeText5, DERIVATIVE_SLOPE = self.partialDerivative5("slope", coordinates, 0, slope, partialSlopeText1, DOWN, 2)
         self.play(FadeTransform(partialSlopeText4, partialSlopeText5))
         self.wait(2)
         self.play(FadeOut(partialSlopeText2), partialSlopeText5.animate.shift(UP))
@@ -231,7 +231,7 @@ class Visualize(Scene):
         partialInterceptText4 = self.partialDerivative4("intercept", coordinates, 0, slope, partialInterceptText1, DOWN, 3.4)
         self.play(FadeTransform(partialInterceptText3, partialInterceptText4))
         self.wait(3)
-        partialInterceptText5 = self.partialDerivative5("intercept", coordinates, 0, slope, partialInterceptText1, DOWN, 2.3)
+        partialInterceptText5, DERIVATIVE_INTERCEPT = self.partialDerivative5("intercept", coordinates, 0, slope, partialInterceptText1, DOWN, 2.3)
         self.play(FadeTransform(partialInterceptText4, partialInterceptText5))
         self.wait(2)
         self.play(FadeOut(partialInterceptText2), partialInterceptText5.animate.shift(UP))
@@ -242,21 +242,108 @@ class Visualize(Scene):
         group = VGroup(*objects)
         self.play(FadeOut(group))
         self.wait(0.5)
-        derivatives = [partialSlopeText1, partialSlopeText5, partialInterceptText1, partialInterceptText5]
-        group = VGroup(*derivatives)
-        self.play(group.animate.shift(LEFT*6))
+        slope = [partialSlopeText1, partialSlopeText5]
+        intercept = [partialInterceptText1, partialInterceptText5]
+        slope = VGroup(*slope)
+        intercept = VGroup(*intercept)
+        #group = VGroup(*derivatives)
+        self.play(slope.animate.shift(LEFT*6))
+        vertical_shift = slope[0].get_center()[1] - intercept[0].get_center()[1]
+        self.play(intercept.animate.shift(UP*vertical_shift))
         # Animate move group to left
-
+        
         
         # Gradient descent
+        stepSizeSlope = r"stepSize_{Slope}"
+        stepSizeSlope2 = r"= \dfrac{\partial RSS}{\partial slope} \cdot learningRate"
+        stepSizeSlope = MathTex(rf"{stepSizeSlope}")
+        stepSizeSlope.next_to(partialSlopeText1, DOWN)
+        horizontal_shift = partialSlopeText1.get_center()[0] - stepSizeSlope.get_center()[0]
+        stepSizeSlope.shift(RIGHT * 1)
+        stepSizeSlope2 = MathTex(rf"{stepSizeSlope2}")
+        stepSizeSlope2.next_to(stepSizeSlope, RIGHT)
+        # Calculate the vertical shift needed to align them
+        
+        # Apply the vertical shift to stepSizeSlope
+        
+        #stepSizeSlope2.shift(LEFT * horizontal_shift)
+        self.play(Write(stepSizeSlope))
+        self.play(Write(stepSizeSlope2))
+        learningRate = 0.01
+        stepSizeSlope3 = MathTex(rf"= {DERIVATIVE_SLOPE} \cdot {learningRate}")
+        stepSizeSlope3.next_to(stepSizeSlope2, DOWN)
+        stepSizeSlope3.shift(LEFT * 1.1)
+        self.play(Write(stepSizeSlope3))
+        stepSizeSlope4 = DERIVATIVE_SLOPE * learningRate
+        stepSizeSlope4 = MathTex(rf"= {stepSizeSlope4}")
+        stepSizeSlope4.next_to(stepSizeSlope2, DOWN)
+        stepSizeSlope4.shift(LEFT * 1.6)
+        self.play(FadeTransform(stepSizeSlope3, stepSizeSlope4))
+        vertical_shift = stepSizeSlope2.get_center()[1] - stepSizeSlope4.get_center()[1]
+        self.play(FadeOut(stepSizeSlope2))
+        self.play(stepSizeSlope4.animate.shift(UP * vertical_shift))
+
+
+
+
         # Visualize
-        """
-        stepSizeIntercept = r"stepSize_{intercept} = slope \cdot learningRate"
+        stepSizeIntercept = r"stepSize_{intercept}"
+        stepSizeIntercept2 = r"= \dfrac{\partial RSS}{\partial slope} \cdot learningRate"
         stepSizeIntercept = MathTex(rf"{stepSizeIntercept}")
-        stepSizeIntercept.next_to(partialInterceptText4, RIGHT)
-        stepSizeIntercept.shift(UP*2)
-        self.play(FadeIn(stepSizeIntercept))
+        stepSizeIntercept.next_to(stepSizeSlope, DOWN)
+        stepSizeIntercept.shift(LEFT*0.7)
+        stepSizeIntercept.shift(DOWN*0.5)
+        horizontal_shift = partialSlopeText1.get_center()[0] - stepSizeIntercept.get_center()[0]
+        stepSizeIntercept.shift(RIGHT * 1)
+        stepSizeIntercept2 = MathTex(rf"{stepSizeIntercept2}")
+        stepSizeIntercept2.next_to(stepSizeIntercept, RIGHT)
+        # Calculate the vertical shift needed to align them
+        
+        # Apply the vertical shift to stepSizeIntercept
+        
+        #stepSizeIntercept2.shift(LEFT * horizontal_shift)
+        self.play(Write(stepSizeIntercept))
+        self.play(Write(stepSizeIntercept2))
+        learningRate = 0.01
+        stepSizeIntercept3 = MathTex(rf"= {DERIVATIVE_INTERCEPT} \cdot {learningRate}")
+        stepSizeIntercept3.next_to(stepSizeIntercept2, DOWN)
+        stepSizeIntercept3.shift(LEFT * 1.1)
+        self.play(Write(stepSizeIntercept3))
+        stepSizeIntercept4 = DERIVATIVE_INTERCEPT * learningRate
+        stepSizeIntercept4 = MathTex(rf"= {stepSizeIntercept4}")
+        stepSizeIntercept4.next_to(stepSizeIntercept2, DOWN)
+        stepSizeIntercept4.shift(LEFT * 1.6)
+        self.play(FadeTransform(stepSizeIntercept3, stepSizeIntercept4))
+        vertical_shift = stepSizeIntercept2.get_center()[1] - stepSizeIntercept4.get_center()[1]
+        self.play(FadeOut(stepSizeIntercept2))
+        self.play(stepSizeIntercept4.animate.shift(UP * vertical_shift))
+
+
+
+
+
+
+
+
+        
+        #self.play(FadeIn(stepSizeIntercept4))
+        #self.play(FadeTransform(stepSizeIntercept4))
+        #self.play
+        #horizontal_shift = stepSizeIntercept.get_center()[0] - stepSizeIntercept2.get_center()[0]
+        #stepSizeIntercept2.shift(RIGHT * horizontal_shift)
+        #self.play(FadeIn(stepSizeIntercept2))
+
         """
+        stepSizeSlope = r"stepSize_{slope} = \dfrac{\partial RSS}{\partial intercept} \cdot learningRate"
+        stepSizeSlope = MathTex(rf"{stepSizeSlope}")
+        stepSizeSlope.next_to(stepSizeIntercept, DOWN)
+        vertical_shift = partialSlopeText5.get_center()[1] - stepSizeSlope.get_center()[1]
+        #stepSizeSlope.shift(UP * vertical_shift)
+        self.play(Write(stepSizeSlope))
+        self.wait(3)
+        """
+
+        
         
         
         
