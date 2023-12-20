@@ -46,8 +46,9 @@ class Visualize(Scene):
         
         derivative = MathTex(rf"{derivative}")
         derivative.next_to(next_to, direction)
+        derivative.align_to(next_to, LEFT)
         # move a bit to left
-        derivative.shift(RIGHT*shiftFactor)
+        #derivative.shift(RIGHT*shiftFactor)
         return derivative
     
     def partialDerivative4(self, wrt, coordinates, intercept, slope, next_to, direction, shiftFactor):
@@ -68,8 +69,9 @@ class Visualize(Scene):
         print(derivative)
         derivative = MathTex(rf"{derivative}")
         derivative.next_to(next_to, direction)
+        derivative.align_to(next_to, LEFT)
         # move a bit to left
-        derivative.shift(RIGHT*shiftFactor)
+        #derivative.shift(RIGHT*shiftFactor)
         return derivative
     
     def partialDerivative5(self, wrt, coordinates, intercept, slope, next_to, direction, shiftFactor):
@@ -86,8 +88,9 @@ class Visualize(Scene):
         derivative = derivative + rf"{totalResult}"
         derivative = MathTex(rf"{derivative}")
         derivative.next_to(next_to, direction)
+        derivative.align_to(next_to, LEFT)
         # move a bit to left
-        derivative.shift(RIGHT*shiftFactor)
+       #derivative.shift(RIGHT*shiftFactor)
         return derivative, totalResult
     
 
@@ -154,15 +157,17 @@ class Visualize(Scene):
         intercept = 0
         line, linetitle = self.graph(axes, f"{slope}*x + {intercept}")
 
-        function = MathTex("y = slope \cdot x + intercept")
-        function2 = MathTex("= {slope} \cdot x + {intercept}")
+        function = MathTex("y")
+        function2 = MathTex("= slope \cdot x + intercept")
+        function3 = MathTex(f"= {slope} \cdot x + {intercept}")
         function.next_to(axes, RIGHT)
         function.shift(UP*2)
         function.shift(LEFT*0.7)
-        function2.next_to(function, DOWN)
-        function2.shift(LEFT*0.9)
-        self.play(Write(function))
-        self.play(Write(function2))
+        function2.next_to(function, RIGHT)
+        function3.next_to(function2, DOWN)
+        function3.align_to(function2, LEFT)
+        self.play(Write(function), Write(function2))
+        self.play(Write(function3))
         # Show regression line
         self.wait(3)
         self.play(Write(line), Write(linetitle))
@@ -193,7 +198,7 @@ class Visualize(Scene):
         for connection in connections.values():
             self.play(Write(connection))
         
-        self.play(FadeOut(function), FadeOut(function2))
+        self.play(FadeOut(function), FadeOut(function2), FadeOut(function3))
 
         # Residuals sum of squares
         RSS = Tex("$RSS = \sum_{i=1}^{n} (y_i - \hat{y}_i)^2$")
@@ -213,10 +218,10 @@ class Visualize(Scene):
         partialSlopeText3 = self.partialDerivative3("slope", coordinates, 0, slope, partialSlopeText2, DOWN, 0.75)
         self.play(Write(partialSlopeText3))
         self.wait(3)
-        partialSlopeText4 = self.partialDerivative4("slope", coordinates, 0, slope, partialSlopeText1, DOWN, 3.3)
+        partialSlopeText4 = self.partialDerivative4("slope", coordinates, 0, slope, partialSlopeText2, DOWN, 3.3)
         self.play(FadeTransform(partialSlopeText3, partialSlopeText4))
         self.wait(3)
-        partialSlopeText5, DERIVATIVE_SLOPE = self.partialDerivative5("slope", coordinates, 0, slope, partialSlopeText1, DOWN, 2)
+        partialSlopeText5, DERIVATIVE_SLOPE = self.partialDerivative5("slope", coordinates, 0, slope, partialSlopeText2, DOWN, 2)
         self.play(FadeTransform(partialSlopeText4, partialSlopeText5))
         self.wait(2)
         self.play(FadeOut(partialSlopeText2), partialSlopeText5.animate.shift(UP))
@@ -229,10 +234,10 @@ class Visualize(Scene):
         partialInterceptText3 = self.partialDerivative3("intercept", coordinates, 0, slope, partialInterceptText2, DOWN, 0.25)
         self.play(Write(partialInterceptText3))
         self.wait(3)
-        partialInterceptText4 = self.partialDerivative4("intercept", coordinates, 0, slope, partialInterceptText1, DOWN, 3.4)
+        partialInterceptText4 = self.partialDerivative4("intercept", coordinates, 0, slope, partialInterceptText2, DOWN, 3.4)
         self.play(FadeTransform(partialInterceptText3, partialInterceptText4))
         self.wait(3)
-        partialInterceptText5, DERIVATIVE_INTERCEPT = self.partialDerivative5("intercept", coordinates, 0, slope, partialInterceptText1, DOWN, 2.3)
+        partialInterceptText5, DERIVATIVE_INTERCEPT = self.partialDerivative5("intercept", coordinates, 0, slope, partialInterceptText2, DOWN, 2.3)
         self.play(FadeTransform(partialInterceptText4, partialInterceptText5))
         self.wait(2)
         self.play(FadeOut(partialInterceptText2), partialInterceptText5.animate.shift(UP))
@@ -259,27 +264,22 @@ class Visualize(Scene):
         stepSizeSlope2 = r"= \dfrac{\partial RSS}{\partial slope} \cdot learningRate"
         stepSizeSlope = MathTex(rf"{stepSizeSlope}")
         stepSizeSlope.next_to(partialSlopeText1, DOWN)
-        horizontal_shift = partialSlopeText1.get_center()[0] - stepSizeSlope.get_center()[0]
         stepSizeSlope.shift(RIGHT * 1)
         stepSizeSlope2 = MathTex(rf"{stepSizeSlope2}")
         stepSizeSlope2.next_to(stepSizeSlope, RIGHT)
-        # Calculate the vertical shift needed to align them
-        
-        # Apply the vertical shift to stepSizeSlope
-        
-        #stepSizeSlope2.shift(LEFT * horizontal_shift)
         self.play(Write(stepSizeSlope))
         self.play(Write(stepSizeSlope2))
         learningRate = 0.01
         stepSizeSlope3 = MathTex(rf"= {DERIVATIVE_SLOPE} \cdot {learningRate}")
         stepSizeSlope3.next_to(stepSizeSlope2, DOWN)
-        stepSizeSlope3.shift(LEFT * 1.1)
+        stepSizeSlope3.align_to(stepSizeSlope2, LEFT)
         self.play(Write(stepSizeSlope3))
+
         stepSizeSlope4 = DERIVATIVE_SLOPE * learningRate
         stepSizeSlopeValue = stepSizeSlope4
         stepSizeSlope4 = MathTex(rf"= {stepSizeSlope4}")
         stepSizeSlope4.next_to(stepSizeSlope2, DOWN)
-        stepSizeSlope4.shift(LEFT * 1.6)
+        stepSizeSlope4.align_to(stepSizeSlope2, LEFT)
         self.play(FadeTransform(stepSizeSlope3, stepSizeSlope4))
         vertical_shift = stepSizeSlope2.get_center()[1] - stepSizeSlope4.get_center()[1]
         self.play(FadeOut(stepSizeSlope2))
@@ -295,27 +295,21 @@ class Visualize(Scene):
         stepSizeIntercept.next_to(stepSizeSlope, DOWN)
         stepSizeIntercept.shift(LEFT*0.7)
         stepSizeIntercept.shift(DOWN*0.5)
-        horizontal_shift = partialSlopeText1.get_center()[0] - stepSizeIntercept.get_center()[0]
         stepSizeIntercept.shift(RIGHT * 1)
         stepSizeIntercept2 = MathTex(rf"{stepSizeIntercept2}")
         stepSizeIntercept2.next_to(stepSizeIntercept, RIGHT)
-        # Calculate the vertical shift needed to align them
-        
-        # Apply the vertical shift to stepSizeIntercept
-        
-        #stepSizeIntercept2.shift(LEFT * horizontal_shift)
         self.play(Write(stepSizeIntercept))
         self.play(Write(stepSizeIntercept2))
         learningRate = 0.01
         stepSizeIntercept3 = MathTex(rf"= {DERIVATIVE_INTERCEPT} \cdot {learningRate}")
         stepSizeIntercept3.next_to(stepSizeIntercept2, DOWN)
-        stepSizeIntercept3.shift(LEFT * 1.1)
+        stepSizeIntercept3.align_to(stepSizeIntercept2, LEFT)
         self.play(Write(stepSizeIntercept3))
         stepSizeIntercept4 = DERIVATIVE_INTERCEPT * learningRate
         stepSizeInterceptValue = stepSizeIntercept4
         stepSizeIntercept4 = MathTex(rf"= {stepSizeIntercept4}")
         stepSizeIntercept4.next_to(stepSizeIntercept2, DOWN)
-        stepSizeIntercept4.shift(LEFT * 1.6)
+        stepSizeIntercept4.align_to(stepSizeIntercept2, LEFT)
         self.play(FadeTransform(stepSizeIntercept3, stepSizeIntercept4))
         vertical_shift = stepSizeIntercept2.get_center()[1] - stepSizeIntercept4.get_center()[1]
         self.play(FadeOut(stepSizeIntercept2))
@@ -340,13 +334,12 @@ class Visualize(Scene):
         newSlope3 = rf"= {slope} - ({stepSizeSlopeValue})"
         newSlope3 = MathTex(rf"{newSlope3}")
         newSlope3.next_to(newSlope2, DOWN)
-        newSlope3.shift(LEFT*1.1)
+        newSlope3.align_to(newSlope2, LEFT)
         self.play(Write(newSlope3))
         newSlope4 = slope - stepSizeSlopeValue
         newSlope4 = MathTex(rf"= {newSlope4}")
-        #newSlope4.next_to(newSlope3, DOWN)
         newSlope4.next_to(newSlope2, DOWN)
-        newSlope4.shift(LEFT*1.8)
+        newSlope4.align_to(newSlope2, LEFT)
         self.play(FadeTransform(newSlope3, newSlope4))
         vertical_shift = newSlope2.get_center()[1] - newSlope4.get_center()[1]
         self.play(FadeOut(newSlope2))
@@ -359,20 +352,19 @@ class Visualize(Scene):
         newintercept1 = MathTex(rf"{newintercept1}")
         newintercept2 = MathTex(rf"{newintercept2}")
         newintercept1.next_to(newSlope1, DOWN)
-        #newintercept1.shift(LEFT)
+        newintercept1.align_to(newSlope1, LEFT)
         newintercept2.next_to(newintercept1, RIGHT)
         self.play(Write(newintercept1))
         self.play(Write(newintercept2))
         newintercept3 = rf"= {intercept} - ({stepSizeInterceptValue})"
         newintercept3 = MathTex(rf"{newintercept3}")
         newintercept3.next_to(newintercept2, DOWN)
-        newintercept3.shift(LEFT*1.8)
+        newintercept3.align_to(newintercept2, LEFT)
         self.play(Write(newintercept3))
         newintercept4 = intercept - stepSizeInterceptValue
         newintercept4 = MathTex(rf"= {newintercept4}")
-        #newintercept4.next_to(newintercept3, DOWN)
         newintercept4.next_to(newintercept2, DOWN)
-        newintercept4.shift(LEFT*2.65)
+        newintercept4.align_to(newintercept2, LEFT)
         self.play(FadeTransform(newintercept3, newintercept4))
         vertical_shift = newintercept2.get_center()[1] - newintercept4.get_center()[1]
         self.play(FadeOut(newintercept2))
