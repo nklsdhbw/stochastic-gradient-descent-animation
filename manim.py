@@ -290,7 +290,7 @@ class Visualize(Scene):
 
         # Visualize
         stepSizeIntercept = r"stepSize_{intercept}"
-        stepSizeIntercept2 = r"= \dfrac{\partial RSS}{\partial slope} \cdot learningRate"
+        stepSizeIntercept2 = r"= \dfrac{\partial RSS}{\partial intercept} \cdot learningRate"
         stepSizeIntercept = MathTex(rf"{stepSizeIntercept}")
         stepSizeIntercept.next_to(stepSizeSlope, DOWN)
         stepSizeIntercept.shift(LEFT*0.7)
