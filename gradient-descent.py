@@ -3,97 +3,14 @@ import sympy as sp
 
 class Visualize(Scene):
     ####* Functions
-    def partialDerivative1(self,wrt, coordinates, intercept, slope, next_to, direction):
-        if wrt == "slope":
-            derivative = r"\dfrac{\partial RSS}{\partial slope}"
-            derivative = MathTex(rf"{derivative}")
-            derivative.next_to(next_to, direction)
-            # move a bit to left
-            derivative.shift(UP*2)
-            derivative.shift(LEFT*0.7)
-        elif wrt == "intercept":
-            derivative = r"\dfrac{\partial RSS}{\partial intercept}"
-            derivative = MathTex(rf"{derivative}")
-            derivative.next_to(next_to, direction)
-            derivative.shift(DOWN*1)
-
-        return derivative
-    
-    def partialDerivative2(self, wrt, coordinates, intercept, slope, next_to, direction, shiftFactor):
-        if wrt == "slope":
-            derivative = r"& = -2 \sum_{i=1}^{n} x_i(y_i - \hat{y}_i) \\ &"
-            derivative = MathTex(rf"{derivative}")
-            derivative.next_to(next_to, direction)
-            # move a bit to left
-        elif wrt == "intercept":
-            derivative = r"\dfrac{\partial RSS}{\partial intercept}  = -2 \sum_{i=1}^{n} (y_i - \hat{y}_i) \\ &"
-            derivative = MathTex(rf"{derivative}")
-            derivative.next_to(next_to, direction)
-        return derivative
-
-    def partialDerivative3(self, wrt, coordinates, intercept, slope, next_to, direction, shiftFactor):
-        derivative = r"&"
-        for cords in coordinates:
-            if cords == coordinates[0]:
-                derivative += r"="
-            x, y = cords
-            if wrt == "slope":
-                derivative += rf"(-2) \cdot {x} \cdot ({intercept} + {slope} \cdot {x}) \\ & +"
-            elif wrt == "intercept":
-                derivative += rf"(-2) \cdot ({intercept} + {slope} \cdot {x}) \\ & +"
-        # Remove last plus sign
-        derivative = derivative[:-1]
-        
-        derivative = MathTex(rf"{derivative}")
-        derivative.next_to(next_to, direction)
-        derivative.align_to(next_to, LEFT)
-        # move a bit to left
-        #derivative.shift(RIGHT*shiftFactor)
-        return derivative
-    
-    def partialDerivative4(self, wrt, coordinates, intercept, slope, next_to, direction, shiftFactor):
-        derivative = r"&"
-        for cords in coordinates:
-            if cords == coordinates[0]:
-                derivative += r"="
-            x, y = cords
-            if wrt == "slope":
-                result = (-2) * x * (intercept + slope * x)
-            elif wrt == "intercept":
-                result = (-2) * (intercept + slope * x)
-            derivative = derivative + rf"{result} +"
-        # Remove last plus sign
-        derivative = derivative[:-1]
-         # replace +- with -
-        derivative = derivative.replace("+-", "-")
-        print(derivative)
-        derivative = MathTex(rf"{derivative}")
-        derivative.next_to(next_to, direction)
-        derivative.align_to(next_to, LEFT)
-        # move a bit to left
-        #derivative.shift(RIGHT*shiftFactor)
-        return derivative
-    
-    def partialDerivative5(self, wrt, coordinates, intercept, slope, next_to, direction, shiftFactor):
-        totalResult = 0
-        derivative = r"&"
-        for cords in coordinates:
-            if cords == coordinates[0]:
-                derivative += r"="
-            x, y = cords
-            if wrt == "slope":
-                totalResult += (-2) * x * (intercept + slope * x)
-            elif wrt == "intercept":
-                totalResult += (-2) * (intercept + slope * x)
-        derivative = derivative + rf"{totalResult}"
-        derivative = MathTex(rf"{derivative}")
-        derivative.next_to(next_to, direction)
-        derivative.align_to(next_to, LEFT)
-        # move a bit to left
-       #derivative.shift(RIGHT*shiftFactor)
-        return derivative, totalResult
-    
-
+    def equation(self, result, next_to, next_to_direction, align_to=None, align_to_direction=None, up=0, left=0):
+        equation = MathTex(rf"{result}")
+        equation.next_to(next_to, next_to_direction)
+        if align_to != None:
+            equation.align_to(align_to, align_to_direction)
+        equation.shift(UP*up)
+        equation.shift(LEFT*left)
+        return equation
 
     def graph(self, axes, formula, title=""):
         x = sp.symbols('x')
@@ -210,39 +127,78 @@ class Visualize(Scene):
         self.play(FadeOut(RSS))
 
         # Derivatives of RSS
-        partialSlopeText1 = self.partialDerivative1("slope", coordinates, 0, slope, axes, RIGHT)
-        partialSlopeText2 = self.partialDerivative2("slope", coordinates, 0, slope, partialSlopeText1, RIGHT, 1.5)
+        # def equationLeftSide(self, result, next_to, next_to_direction, align_to, align_to_direction, up=0, left=0):
+        derivativeSlope = r"&"
+        derivativeIntercept = r"&"
+        simplifiedDerivativeSlope = r"&"
+        simplifiedDerivativeIntercept = r"&"
+        totalResultSlope = 0
+        totalResultIntercept = 0
+        totalResultSlopeString = r"="
+        totalResultInterceptString = r"="
+        for cords in coordinates:
+            if cords == coordinates[0]:
+                derivativeIntercept += r"="
+                derivativeSlope += r"="
+                simplifiedDerivativeSlope += r"="
+                simplifiedDerivativeIntercept += r"="
+            x, y = cords
+            derivativeSlope += rf"(-2) \cdot {x} \cdot ({intercept} + {slope} \cdot {x}) \\ & +"
+            derivativeIntercept += rf"(-2) \cdot ({intercept} + {slope} \cdot {x}) \\ & +"
+            calculationSlope = (-2) * x * (intercept + slope * x)
+            calculationIntercept = (-2) * (intercept + slope * x)
+            totalResultSlope += calculationSlope
+            totalResultIntercept += calculationIntercept
+            simplifiedDerivativeIntercept += rf"{calculationIntercept} +"
+            simplifiedDerivativeSlope += rf"{calculationSlope} +"
+        derivativeSlope = derivativeSlope[:-1]
+        derivativeIntercept = derivativeIntercept[:-1]
+        simplifiedDerivativeIntercept = simplifiedDerivativeIntercept[:-1]
+        simplifiedDerivativeIntercept = simplifiedDerivativeIntercept.replace("+-", "-")
+        simplifiedDerivativeSlope = simplifiedDerivativeSlope[:-1]
+        simplifiedDerivativeSlope = simplifiedDerivativeSlope.replace("+-", "-")
+        totalResultSlopeString += rf"{totalResultSlope}"
+        totalResultInterceptString += rf"{totalResultIntercept}"
+        partialSlopeText1 = self.equation(result=r"\dfrac{\partial RSS}{\partial slope}", next_to=axes, next_to_direction=RIGHT, align_to=None, align_to_direction=None, up=2, left=0.7)
+        partialSlopeText2 = self.equation(result=r"& = -2 \sum_{i=1}^{n} x_i(y_i - \hat{y}_i) \\ &", next_to=partialSlopeText1, next_to_direction=RIGHT, align_to=None, align_to_direction=None, up=0, left=0)
+        partialSlopeText3 = self.equation(result=derivativeSlope, next_to=partialSlopeText2, next_to_direction=DOWN, align_to=partialSlopeText2, align_to_direction=LEFT, up=0, left=0)
+        partialSlopeText4 = self.equation(result=simplifiedDerivativeSlope, next_to=partialSlopeText2, next_to_direction=DOWN, align_to=partialSlopeText3, align_to_direction=LEFT, up=0, left=0)
+        partialSlopeText5 = self.equation(result=totalResultSlopeString, next_to=partialSlopeText2, next_to_direction=DOWN, align_to=partialSlopeText4, align_to_direction=LEFT, up=0, left=0)
+        # Remove last plus sign
         self.play(Write(partialSlopeText1))
         
         self.play(Write(partialSlopeText2))
-        partialSlopeText3 = self.partialDerivative3("slope", coordinates, 0, slope, partialSlopeText2, DOWN, 0.75)
         self.play(Write(partialSlopeText3))
         self.wait(3)
-        partialSlopeText4 = self.partialDerivative4("slope", coordinates, 0, slope, partialSlopeText2, DOWN, 3.3)
+        
         self.play(FadeTransform(partialSlopeText3, partialSlopeText4))
         self.wait(3)
-        partialSlopeText5, DERIVATIVE_SLOPE = self.partialDerivative5("slope", coordinates, 0, slope, partialSlopeText2, DOWN, 2)
+        #partialSlopeText5, DERIVATIVE_SLOPE = self.partialDerivative5("slope", coordinates, 0, slope, partialSlopeText2, DOWN, 2)
         self.play(FadeTransform(partialSlopeText4, partialSlopeText5))
         self.wait(2)
-        self.play(FadeOut(partialSlopeText2), partialSlopeText5.animate.shift(UP))
+        self.play(FadeOut(partialSlopeText2), partialSlopeText5.animate.next_to(partialSlopeText1, RIGHT))
         self.wait(2)
 
-        partialInterceptText1 = self.partialDerivative1("intercept", coordinates, 0, slope, partialSlopeText1, DOWN)
-        partialInterceptText2 = self.partialDerivative2("slope", coordinates, 0, slope, partialInterceptText1, RIGHT, 1.5)
+        partialInterceptText1 = self.equation(result=r"\dfrac{\partial RSS}{\partial intercept}", next_to=partialSlopeText1, next_to_direction=DOWN, align_to=None, align_to_direction=None, up=0, left=0)
+        partialInterceptText2 = self.equation(result=r"= -2 \sum_{i=1}^{n} (y_i - \hat{y}_i) \\ &", next_to=partialInterceptText1, next_to_direction=RIGHT, align_to=None, align_to_direction=None, up=0, left=0)
+        partialInterceptText3 = self.equation(result=derivativeIntercept, next_to=partialInterceptText2, next_to_direction=DOWN, align_to=partialInterceptText2, align_to_direction=LEFT, up=0, left=0)
+        partialInterceptText4 = self.equation(result=simplifiedDerivativeIntercept, next_to=partialInterceptText2, next_to_direction=DOWN, align_to=partialInterceptText3, align_to_direction=LEFT, up=0, left=0)
+        partialInterceptText5 = self.equation(result=totalResultInterceptString, next_to=partialInterceptText2, next_to_direction=DOWN, align_to=partialInterceptText4, align_to_direction=LEFT, up=0, left=0)
+
         self.play(Write(partialInterceptText1))
+        
         self.play(Write(partialInterceptText2))
-        partialInterceptText3 = self.partialDerivative3("intercept", coordinates, 0, slope, partialInterceptText2, DOWN, 0.25)
         self.play(Write(partialInterceptText3))
         self.wait(3)
-        partialInterceptText4 = self.partialDerivative4("intercept", coordinates, 0, slope, partialInterceptText2, DOWN, 3.4)
+        
         self.play(FadeTransform(partialInterceptText3, partialInterceptText4))
         self.wait(3)
-        partialInterceptText5, DERIVATIVE_INTERCEPT = self.partialDerivative5("intercept", coordinates, 0, slope, partialInterceptText2, DOWN, 2.3)
+        #partialSlopeText5, DERIVATIVE_SLOPE = self.partialDerivative5("slope", coordinates, 0, slope, partialSlopeText2, DOWN, 2)
         self.play(FadeTransform(partialInterceptText4, partialInterceptText5))
         self.wait(2)
-        self.play(FadeOut(partialInterceptText2), partialInterceptText5.animate.shift(UP))
+        self.play(FadeOut(partialInterceptText2), partialInterceptText5.animate.next_to(partialInterceptText1, RIGHT))
         self.wait(2)
-
+        
         # clear up all objects
         objects = [axes, x_label, y_label, *dots, *newDots.values(), *connections.values(), line, linetitle]
         group = VGroup(*objects)
@@ -270,12 +226,12 @@ class Visualize(Scene):
         self.play(Write(stepSizeSlope))
         self.play(Write(stepSizeSlope2))
         learningRate = 0.01
-        stepSizeSlope3 = MathTex(rf"= {DERIVATIVE_SLOPE} \cdot {learningRate}")
+        stepSizeSlope3 = MathTex(rf"= {totalResultSlope} \cdot {learningRate}")
         stepSizeSlope3.next_to(stepSizeSlope2, DOWN)
         stepSizeSlope3.align_to(stepSizeSlope2, LEFT)
         self.play(Write(stepSizeSlope3))
 
-        stepSizeSlope4 = DERIVATIVE_SLOPE * learningRate
+        stepSizeSlope4 = totalResultSlope * learningRate
         stepSizeSlopeValue = stepSizeSlope4
         stepSizeSlope4 = MathTex(rf"= {stepSizeSlope4}")
         stepSizeSlope4.next_to(stepSizeSlope2, DOWN)
@@ -301,11 +257,11 @@ class Visualize(Scene):
         self.play(Write(stepSizeIntercept))
         self.play(Write(stepSizeIntercept2))
         learningRate = 0.01
-        stepSizeIntercept3 = MathTex(rf"= {DERIVATIVE_INTERCEPT} \cdot {learningRate}")
+        stepSizeIntercept3 = MathTex(rf"= {totalResultIntercept} \cdot {learningRate}")
         stepSizeIntercept3.next_to(stepSizeIntercept2, DOWN)
         stepSizeIntercept3.align_to(stepSizeIntercept2, LEFT)
         self.play(Write(stepSizeIntercept3))
-        stepSizeIntercept4 = DERIVATIVE_INTERCEPT * learningRate
+        stepSizeIntercept4 = totalResultIntercept * learningRate
         stepSizeInterceptValue = stepSizeIntercept4
         stepSizeIntercept4 = MathTex(rf"= {stepSizeIntercept4}")
         stepSizeIntercept4.next_to(stepSizeIntercept2, DOWN)
@@ -447,7 +403,7 @@ class Visualize(Scene):
         #horizontal_shift = stepSizeIntercept.get_center()[0] - stepSizeIntercept2.get_center()[0]
         #stepSizeIntercept2.shift(RIGHT * horizontal_shift)
         #self.play(FadeIn(stepSizeIntercept2))
-
+    
         """
         stepSizeSlope = r"stepSize_{slope} = \dfrac{\partial RSS}{\partial intercept} \cdot learningRate"
         stepSizeSlope = MathTex(rf"{stepSizeSlope}")
@@ -457,7 +413,6 @@ class Visualize(Scene):
         self.play(Write(stepSizeSlope))
         self.wait(3)
         """
-
         
         
         
