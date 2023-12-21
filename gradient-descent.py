@@ -216,60 +216,40 @@ class Visualize(Scene):
         
         
         # Gradient descent
-        stepSizeSlope = r"stepSize_{Slope}"
-        stepSizeSlope2 = r"= \dfrac{\partial RSS}{\partial slope} \cdot learningRate"
-        stepSizeSlope = MathTex(rf"{stepSizeSlope}")
-        stepSizeSlope.next_to(partialSlopeText1, DOWN)
-        stepSizeSlope.shift(RIGHT * 1)
-        stepSizeSlope2 = MathTex(rf"{stepSizeSlope2}")
-        stepSizeSlope2.next_to(stepSizeSlope, RIGHT)
+        stepSizeSlope = self.equation(result=r"stepSize_{Slope}", next_to=partialSlopeText1, next_to_direction=DOWN, left=-1)
+        stepSizeSlope2 = self.equation(result = r"= \dfrac{\partial RSS}{\partial slope} \cdot learningRate", next_to=stepSizeSlope, next_to_direction=RIGHT)
         self.play(Write(stepSizeSlope))
         self.play(Write(stepSizeSlope2))
+
         learningRate = 0.01
-        stepSizeSlope3 = MathTex(rf"= {totalResultSlope} \cdot {learningRate}")
-        stepSizeSlope3.next_to(stepSizeSlope2, DOWN)
-        stepSizeSlope3.align_to(stepSizeSlope2, LEFT)
+        stepSizeSlope3 = self.equation(rf"= {totalResultSlope} \cdot {learningRate}", next_to=stepSizeSlope2, next_to_direction=DOWN, align_to=stepSizeSlope2, align_to_direction=LEFT)
         self.play(Write(stepSizeSlope3))
 
-        stepSizeSlope4 = totalResultSlope * learningRate
-        stepSizeSlopeValue = stepSizeSlope4
-        stepSizeSlope4 = MathTex(rf"= {stepSizeSlope4}")
-        stepSizeSlope4.next_to(stepSizeSlope2, DOWN)
-        stepSizeSlope4.align_to(stepSizeSlope2, LEFT)
+        stepSizeSlopeValue  = totalResultSlope * learningRate
+        stepSizeSlope4 = self.equation(result=rf"= {stepSizeSlopeValue}", next_to=stepSizeSlope2, next_to_direction=DOWN, align_to=stepSizeSlope2, align_to_direction=LEFT)
         self.play(FadeTransform(stepSizeSlope3, stepSizeSlope4))
-        vertical_shift = stepSizeSlope2.get_center()[1] - stepSizeSlope4.get_center()[1]
         self.play(FadeOut(stepSizeSlope2))
-        self.play(stepSizeSlope4.animate.shift(UP * vertical_shift))
+        self.play(stepSizeSlope4.animate.next_to(stepSizeSlope, RIGHT))
 
 
 
 
         # Visualize
         stepSizeIntercept = r"stepSize_{intercept}"
-        stepSizeIntercept2 = r"= \dfrac{\partial RSS}{\partial intercept} \cdot learningRate"
-        stepSizeIntercept = MathTex(rf"{stepSizeIntercept}")
-        stepSizeIntercept.next_to(stepSizeSlope, DOWN)
-        stepSizeIntercept.shift(LEFT*0.7)
-        stepSizeIntercept.shift(DOWN*0.5)
-        stepSizeIntercept.shift(RIGHT * 1)
-        stepSizeIntercept2 = MathTex(rf"{stepSizeIntercept2}")
-        stepSizeIntercept2.next_to(stepSizeIntercept, RIGHT)
+        stepSizeIntercept = self.equation(result=r"{stepSizeIntercept}", next_to=stepSizeSlope, next_to_direction=DOWN, left=0.3, up=-0.5)
+        stepSizeIntercept2 = self.equation(result=r"= \dfrac{\partial RSS}{\partial intercept} \cdot learningRate", next_to=stepSizeIntercept, next_to_direction=RIGHT)
         self.play(Write(stepSizeIntercept))
         self.play(Write(stepSizeIntercept2))
+        
         learningRate = 0.01
-        stepSizeIntercept3 = MathTex(rf"= {totalResultIntercept} \cdot {learningRate}")
-        stepSizeIntercept3.next_to(stepSizeIntercept2, DOWN)
-        stepSizeIntercept3.align_to(stepSizeIntercept2, LEFT)
+        stepSizeIntercept3 = self.equation(result=rf"= {totalResultIntercept} \cdot {learningRate}", next_to=stepSizeIntercept2, next_to_direction=DOWN, align_to=stepSizeIntercept2, align_to_direction=LEFT)
         self.play(Write(stepSizeIntercept3))
-        stepSizeIntercept4 = totalResultIntercept * learningRate
-        stepSizeInterceptValue = stepSizeIntercept4
-        stepSizeIntercept4 = MathTex(rf"= {stepSizeIntercept4}")
-        stepSizeIntercept4.next_to(stepSizeIntercept2, DOWN)
-        stepSizeIntercept4.align_to(stepSizeIntercept2, LEFT)
+
+        stepSizeInterceptValue = totalResultIntercept * learningRate
+        stepSizeIntercept4 = self.equation(result=rf"= {stepSizeInterceptValue}", next_to=stepSizeIntercept2, next_to_direction=DOWN, align_to=stepSizeIntercept2, align_to_direction=LEFT)
         self.play(FadeTransform(stepSizeIntercept3, stepSizeIntercept4))
-        vertical_shift = stepSizeIntercept2.get_center()[1] - stepSizeIntercept4.get_center()[1]
         self.play(FadeOut(stepSizeIntercept2))
-        self.play(stepSizeIntercept4.animate.shift(UP * vertical_shift))
+        self.play(stepSizeIntercept4.animate.next_to(stepSizeIntercept, RIGHT))
         stepsize = [stepSizeSlope, stepSizeSlope4, stepSizeIntercept, stepSizeIntercept4]
         stepsize = VGroup(*stepsize)
 
