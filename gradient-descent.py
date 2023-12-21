@@ -337,6 +337,7 @@ class Visualize(Scene):
         newSlope3.align_to(newSlope2, LEFT)
         self.play(Write(newSlope3))
         newSlope4 = slope - stepSizeSlopeValue
+        newSlopeValue = newSlope4
         newSlope4 = MathTex(rf"= {newSlope4}")
         newSlope4.next_to(newSlope2, DOWN)
         newSlope4.align_to(newSlope2, LEFT)
@@ -362,6 +363,7 @@ class Visualize(Scene):
         newintercept3.align_to(newintercept2, LEFT)
         self.play(Write(newintercept3))
         newintercept4 = intercept - stepSizeInterceptValue
+        newinterceptValue = newintercept4
         newintercept4 = MathTex(rf"= {newintercept4}")
         newintercept4.next_to(newintercept2, DOWN)
         newintercept4.align_to(newintercept2, LEFT)
@@ -370,13 +372,74 @@ class Visualize(Scene):
         self.play(FadeOut(newintercept2))
         self.play(newintercept4.animate.shift(UP * vertical_shift))
 
+        # Clear stepsizes
+        stepsizes = [stepSizeSlope, stepSizeSlope4, stepSizeIntercept, stepSizeIntercept4]
+        stepsizes = VGroup(*stepsizes)
+        self.play(FadeOut(stepsizes))
+        linearFunction1 = MathTex("y")
+        linearFunction2 = MathTex("= slope \cdot x + intercept")
+        linearFunction3 = MathTex(f"= {newSlopeValue} \cdot x + {newinterceptValue}")
+        linearFunction1.next_to(newintercept1, DOWN)
+        linearFunction1.align_to(newintercept1, LEFT)
+        linearFunction2.next_to(linearFunction1, RIGHT)
+        linearFunction3.next_to(linearFunction2, DOWN)
+        linearFunction3.align_to(linearFunction2, LEFT)
+        self.play(Write(linearFunction1))
+        self.play(Write(linearFunction2))
+        self.play(Write(linearFunction3))
+        self.play(FadeOut(linearFunction2), linearFunction3.animate.align_to(linearFunction1, UP))
+        
+        # Clear new slopes and intercepts
+        remove = [newSlope1, newSlope4, newintercept1, newintercept4]
+        remove = VGroup(*remove)
+        self.play(FadeOut(remove))
+
+        # Move linear function to the right
+        linearFunction = [linearFunction1, linearFunction3]
+        linearFunction = VGroup(*linearFunction)
+        self.play(linearFunction.animate.shift(RIGHT*5))
+        self.wait(2)
+
+        # Show coordinate system again
+
+        self.play(Create(axes), Write(x_label), Write(y_label))
+        self.wait(2)
+        for dot in dots:
+            self.play(Write(dot))
+        self.wait(2)
+
+        # Add new regression line
+        line, linetitle = self.graph(axes, f"{newSlopeValue}*x + {newinterceptValue}")
+        self.play(Write(line), Write(linetitle))
 
 
+        # Create orthogonal lines
+        perpendicular_slope = -1 / newSlopeValue
+        newDots = {}
+        for dot_obj, cords in zip(dots, coordinates):
+            # y = mx + b
+            x, y = cords
+            b = y - x*(perpendicular_slope)
+            
+            m1, b1 = (newSlopeValue, newinterceptValue)
+            m2, b2 = (perpendicular_slope, b)
+            x_value = (b2 - b1) / (m1 - m2)
+            y_value = m2 * x_value + b2
+            new_dot = self.dot(axes, x_value, y_value)
+            newDots[dot_obj] = new_dot
 
+        # Draw loss function lines
+        connections = {}
+        for dot_obj, new_dot in newDots.items():
+            connections[dot_obj] = DashedLine(dot_obj.get_center(), new_dot.get_center(), color=RED)
 
+        for connection in connections.values():
+            self.play(Write(connection))
+        
 
-
-
+        # Residuals sum of squares
+        self.play(FadeIn(RSS))
+        #self.play(FadeOut(function), FadeOut(function2), FadeOut(function3))
         
         #self.play(FadeIn(stepSizeIntercept4))
         #self.play(FadeTransform(stepSizeIntercept4))
