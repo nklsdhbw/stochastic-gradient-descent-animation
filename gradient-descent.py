@@ -258,55 +258,32 @@ class Visualize(Scene):
         self.play(FadeOut(slopeGroup), FadeOut(interceptGroup))
         self.play(stepsize.animate.shift(UP*2))
 
-        newSlope1 = r"slope_{new}"
-        newSlope2 = r"= slope_{old} - stepSize_{slope}"
-        newSlope1 = MathTex(rf"{newSlope1}")
-        newSlope2 = MathTex(rf"{newSlope2}")
-        newSlope1.next_to(stepsize, DOWN)
-        newSlope1.shift(LEFT*2)
-        newSlope2.next_to(newSlope1, RIGHT)
+        newSlope1 = self.equation(result=r"slope_{new}",next_to=stepSizeIntercept, next_to_direction=DOWN, left=-2)
+        newSlope2 = self.equation(result=r"= slope_{old} - stepSize_{slope}", next_to=newSlope1, next_to_direction=RIGHT)
         self.play(Write(newSlope1))
         self.play(Write(newSlope2))
-        newSlope3 = rf"= {slope} - ({stepSizeSlopeValue})"
-        newSlope3 = MathTex(rf"{newSlope3}")
-        newSlope3.next_to(newSlope2, DOWN)
-        newSlope3.align_to(newSlope2, LEFT)
+        newSlope3 = self.equation(result=rf"= {slope} - ({stepSizeSlopeValue})", next_to=newSlope2, next_to_direction=DOWN, align_to=newSlope2, align_to_direction=LEFT)
         self.play(Write(newSlope3))
-        newSlope4 = slope - stepSizeSlopeValue
-        newSlopeValue = newSlope4
-        newSlope4 = MathTex(rf"= {newSlope4}")
-        newSlope4.next_to(newSlope2, DOWN)
-        newSlope4.align_to(newSlope2, LEFT)
+        newSlopeValue = slope - stepSizeSlopeValue
+        newSlope4 = self.equation(result=rf"= {newSlopeValue}", next_to=newSlope2, next_to_direction=DOWN, align_to=newSlope2, align_to_direction=LEFT)
         self.play(FadeTransform(newSlope3, newSlope4))
-        vertical_shift = newSlope2.get_center()[1] - newSlope4.get_center()[1]
         self.play(FadeOut(newSlope2))
-        self.play(newSlope4.animate.shift(UP * vertical_shift))
+        self.play(newSlope4.animate.next_to(newSlope1, RIGHT))
 
         
         
-        newintercept1 = r"intercept_{new}"
-        newintercept2 = r"= intercept_{old} - stepSize_{intercept}"
-        newintercept1 = MathTex(rf"{newintercept1}")
-        newintercept2 = MathTex(rf"{newintercept2}")
-        newintercept1.next_to(newSlope1, DOWN)
-        newintercept1.align_to(newSlope1, LEFT)
-        newintercept2.next_to(newintercept1, RIGHT)
+        newintercept1 = self.equation(result=r"intercept_{new}", next_to=newSlope1, next_to_direction=DOWN)
+        newintercept2 = self.equation(result=r"= intercept_{old} - stepSize_{intercept}", next_to=newintercept1, next_to_direction=RIGHT)
         self.play(Write(newintercept1))
         self.play(Write(newintercept2))
-        newintercept3 = rf"= {intercept} - ({stepSizeInterceptValue})"
-        newintercept3 = MathTex(rf"{newintercept3}")
-        newintercept3.next_to(newintercept2, DOWN)
-        newintercept3.align_to(newintercept2, LEFT)
+
+        newintercept3 = self.equation(result=rf"= {intercept} - ({stepSizeInterceptValue})", next_to=newintercept2, next_to_direction=DOWN, align_to=newintercept2, align_to_direction=LEFT)
         self.play(Write(newintercept3))
-        newintercept4 = intercept - stepSizeInterceptValue
-        newinterceptValue = newintercept4
-        newintercept4 = MathTex(rf"= {newintercept4}")
-        newintercept4.next_to(newintercept2, DOWN)
-        newintercept4.align_to(newintercept2, LEFT)
+        newinterceptValue = intercept - stepSizeInterceptValue
+        newintercept4 = self.equation(result=rf"= {newinterceptValue}", next_to=newintercept2, next_to_direction=DOWN, align_to=newintercept2, align_to_direction=LEFT)
         self.play(FadeTransform(newintercept3, newintercept4))
-        vertical_shift = newintercept2.get_center()[1] - newintercept4.get_center()[1]
         self.play(FadeOut(newintercept2))
-        self.play(newintercept4.animate.shift(UP * vertical_shift))
+        self.play(newintercept4.animate.next_to(newintercept1, RIGHT))
 
         # Clear stepsizes
         stepsizes = [stepSizeSlope, stepSizeSlope4, stepSizeIntercept, stepSizeIntercept4]
