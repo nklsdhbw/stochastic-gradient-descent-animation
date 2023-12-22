@@ -3,6 +3,20 @@ import sympy as sp
 
 class Visualize(Scene):
     ####* Functions
+    def drawCoordinateSystem(self, x_range, y_range, size):
+        axes = Axes(
+            x_range=x_range,
+            y_range=y_range,
+            axis_config={"color": WHITE,},
+            x_length = size,
+            y_length = size,
+            
+        )
+        # Add labels to the axes
+        x_label = axes.get_x_axis_label("x")
+        y_label = axes.get_y_axis_label("y")
+        return axes, x_label, y_label
+    
     def drawLoss(self, dots, coordinates, axes, slope, intercept):
         perpendicular_slope = -1 / slope
         newDots = {}
@@ -59,17 +73,7 @@ class Visualize(Scene):
         self.wait(2)
 
         # Create axes
-        axes = Axes(
-            x_range=[0, 5],
-            y_range=[0, 5],
-            axis_config={"color": WHITE,},
-            x_length = 6,
-            y_length = 6,
-            
-        )
-        # Add labels to the axes
-        x_label = axes.get_x_axis_label("x")
-        y_label = axes.get_y_axis_label("y")
+        axes, x_label, y_label = self.drawCoordinateSystem(x_range=[0, 5], y_range=[0, 5], size=6)
 
         # Create a dots
         dots = []
