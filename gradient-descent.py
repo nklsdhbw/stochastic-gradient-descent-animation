@@ -3,6 +3,30 @@ import sympy as sp
 
 class Visualize(Scene):
     ####* Functions
+    def drawLoss(self, dots, coordinates, axes, slope, intercept):
+        perpendicular_slope = -1 / slope
+        newDots = {}
+        for dot_obj, cords in zip(dots, coordinates):
+            # y = mx + b
+            x, y = cords
+            b = y - x*(perpendicular_slope)
+            
+            m1, b1 = (slope, intercept)
+            m2, b2 = (perpendicular_slope, b)
+            x_value = (b2 - b1) / (m1 - m2)
+            y_value = m2 * x_value + b2
+            new_dot = self.dot(axes, x_value, y_value)
+            newDots[dot_obj] = new_dot
+
+        # Draw loss function lines
+        connections = {}
+        for dot_obj, new_dot in newDots.items():
+            connections[dot_obj] = DashedLine(dot_obj.get_center(), new_dot.get_center(), color=RED)
+
+        for connection in connections.values():
+            self.play(Write(connection))
+        return newDots, connections
+
     def equation(self, result, next_to, next_to_direction, align_to=None, align_to_direction=None, up=0, left=0):
         equation = MathTex(rf"{result}")
         equation.next_to(next_to, next_to_direction)
@@ -93,27 +117,8 @@ class Visualize(Scene):
 
 
         # Create orthogonal lines
-        perpendicular_slope = -1 / slope
-        newDots = {}
-        for dot_obj, cords in zip(dots, coordinates):
-            # y = mx + b
-            x, y = cords
-            b = y - x*(perpendicular_slope)
-            
-            m1, b1 = (slope, 0)
-            m2, b2 = (perpendicular_slope, b)
-            x_value = (b2 - b1) / (m1 - m2)
-            y_value = m2 * x_value + b2
-            new_dot = self.dot(axes, x_value, y_value)
-            newDots[dot_obj] = new_dot
+        newDots, connections = self.drawLoss(dots, coordinates, axes, slope, intercept)
 
-        # Draw loss function lines
-        connections = {}
-        for dot_obj, new_dot in newDots.items():
-            connections[dot_obj] = DashedLine(dot_obj.get_center(), new_dot.get_center(), color=RED)
-
-        for connection in connections.values():
-            self.play(Write(connection))
         
         self.play(FadeOut(function), FadeOut(function2), FadeOut(function3))
 
@@ -127,7 +132,6 @@ class Visualize(Scene):
         self.play(FadeOut(RSS))
 
         # Derivatives of RSS
-        # def equationLeftSide(self, result, next_to, next_to_direction, align_to, align_to_direction, up=0, left=0):
         derivativeSlope = r"&"
         derivativeIntercept = r"&"
         simplifiedDerivativeSlope = r"&"
@@ -159,11 +163,11 @@ class Visualize(Scene):
         simplifiedDerivativeSlope = simplifiedDerivativeSlope.replace("+-", "-")
         totalResultSlopeString += rf"{totalResultSlope}"
         totalResultInterceptString += rf"{totalResultIntercept}"
-        partialSlopeText1 = self.equation(result=r"\dfrac{\partial RSS}{\partial slope}", next_to=axes, next_to_direction=RIGHT, align_to=None, align_to_direction=None, up=2, left=0.7)
-        partialSlopeText2 = self.equation(result=r"& = -2 \sum_{i=1}^{n} x_i(y_i - \hat{y}_i) \\ &", next_to=partialSlopeText1, next_to_direction=RIGHT, align_to=None, align_to_direction=None, up=0, left=0)
-        partialSlopeText3 = self.equation(result=derivativeSlope, next_to=partialSlopeText2, next_to_direction=DOWN, align_to=partialSlopeText2, align_to_direction=LEFT, up=0, left=0)
-        partialSlopeText4 = self.equation(result=simplifiedDerivativeSlope, next_to=partialSlopeText2, next_to_direction=DOWN, align_to=partialSlopeText3, align_to_direction=LEFT, up=0, left=0)
-        partialSlopeText5 = self.equation(result=totalResultSlopeString, next_to=partialSlopeText2, next_to_direction=DOWN, align_to=partialSlopeText4, align_to_direction=LEFT, up=0, left=0)
+        partialSlopeText1 = self.equation(result=r"\dfrac{\partial RSS}{\partial slope}", next_to=axes, next_to_direction=RIGHT, up=2, left=0.7)
+        partialSlopeText2 = self.equation(result=r"& = -2 \sum_{i=1}^{n} x_i(y_i - \hat{y}_i) \\ &", next_to=partialSlopeText1, next_to_direction=RIGHT)
+        partialSlopeText3 = self.equation(result=derivativeSlope, next_to=partialSlopeText2, next_to_direction=DOWN, align_to=partialSlopeText2, align_to_direction=LEFT)
+        partialSlopeText4 = self.equation(result=simplifiedDerivativeSlope, next_to=partialSlopeText2, next_to_direction=DOWN, align_to=partialSlopeText3, align_to_direction=LEFT)
+        partialSlopeText5 = self.equation(result=totalResultSlopeString, next_to=partialSlopeText2, next_to_direction=DOWN, align_to=partialSlopeText4, align_to_direction=LEFT)
         # Remove last plus sign
         self.play(Write(partialSlopeText1))
         
@@ -172,18 +176,15 @@ class Visualize(Scene):
         self.wait(3)
         
         self.play(FadeTransform(partialSlopeText3, partialSlopeText4))
-        self.wait(3)
-        #partialSlopeText5, DERIVATIVE_SLOPE = self.partialDerivative5("slope", coordinates, 0, slope, partialSlopeText2, DOWN, 2)
-        self.play(FadeTransform(partialSlopeText4, partialSlopeText5))
         self.wait(2)
         self.play(FadeOut(partialSlopeText2), partialSlopeText5.animate.next_to(partialSlopeText1, RIGHT))
         self.wait(2)
 
-        partialInterceptText1 = self.equation(result=r"\dfrac{\partial RSS}{\partial intercept}", next_to=partialSlopeText1, next_to_direction=DOWN, align_to=None, align_to_direction=None, up=0, left=0)
-        partialInterceptText2 = self.equation(result=r"= -2 \sum_{i=1}^{n} (y_i - \hat{y}_i) \\ &", next_to=partialInterceptText1, next_to_direction=RIGHT, align_to=None, align_to_direction=None, up=0, left=0)
-        partialInterceptText3 = self.equation(result=derivativeIntercept, next_to=partialInterceptText2, next_to_direction=DOWN, align_to=partialInterceptText2, align_to_direction=LEFT, up=0, left=0)
-        partialInterceptText4 = self.equation(result=simplifiedDerivativeIntercept, next_to=partialInterceptText2, next_to_direction=DOWN, align_to=partialInterceptText3, align_to_direction=LEFT, up=0, left=0)
-        partialInterceptText5 = self.equation(result=totalResultInterceptString, next_to=partialInterceptText2, next_to_direction=DOWN, align_to=partialInterceptText4, align_to_direction=LEFT, up=0, left=0)
+        partialInterceptText1 = self.equation(result=r"\dfrac{\partial RSS}{\partial intercept}", next_to=partialSlopeText1, next_to_direction=DOWN)
+        partialInterceptText2 = self.equation(result=r"= -2 \sum_{i=1}^{n} (y_i - \hat{y}_i) \\ &", next_to=partialInterceptText1, next_to_direction=RIGHT)
+        partialInterceptText3 = self.equation(result=derivativeIntercept, next_to=partialInterceptText2, next_to_direction=DOWN, align_to=partialInterceptText2, align_to_direction=LEFT)
+        partialInterceptText4 = self.equation(result=simplifiedDerivativeIntercept, next_to=partialInterceptText2, next_to_direction=DOWN, align_to=partialInterceptText3, align_to_direction=LEFT)
+        partialInterceptText5 = self.equation(result=totalResultInterceptString, next_to=partialInterceptText2, next_to_direction=DOWN, align_to=partialInterceptText4, align_to_direction=LEFT)
 
         self.play(Write(partialInterceptText1))
         
@@ -327,50 +328,7 @@ class Visualize(Scene):
 
 
         # Create orthogonal lines
-        perpendicular_slope = -1 / newSlopeValue
-        newDots = {}
-        for dot_obj, cords in zip(dots, coordinates):
-            # y = mx + b
-            x, y = cords
-            b = y - x*(perpendicular_slope)
-            
-            m1, b1 = (newSlopeValue, newinterceptValue)
-            m2, b2 = (perpendicular_slope, b)
-            x_value = (b2 - b1) / (m1 - m2)
-            y_value = m2 * x_value + b2
-            new_dot = self.dot(axes, x_value, y_value)
-            newDots[dot_obj] = new_dot
-
-        # Draw loss function lines
-        connections = {}
-        for dot_obj, new_dot in newDots.items():
-            connections[dot_obj] = DashedLine(dot_obj.get_center(), new_dot.get_center(), color=RED)
-
-        for connection in connections.values():
-            self.play(Write(connection))
-        
-
-        # Residuals sum of squares
-        self.play(FadeIn(RSS))
-        #self.play(FadeOut(function), FadeOut(function2), FadeOut(function3))
-        
-        #self.play(FadeIn(stepSizeIntercept4))
-        #self.play(FadeTransform(stepSizeIntercept4))
-        #self.play
-        #horizontal_shift = stepSizeIntercept.get_center()[0] - stepSizeIntercept2.get_center()[0]
-        #stepSizeIntercept2.shift(RIGHT * horizontal_shift)
-        #self.play(FadeIn(stepSizeIntercept2))
-    
-        """
-        stepSizeSlope = r"stepSize_{slope} = \dfrac{\partial RSS}{\partial intercept} \cdot learningRate"
-        stepSizeSlope = MathTex(rf"{stepSizeSlope}")
-        stepSizeSlope.next_to(stepSizeIntercept, DOWN)
-        vertical_shift = partialSlopeText5.get_center()[1] - stepSizeSlope.get_center()[1]
-        #stepSizeSlope.shift(UP * vertical_shift)
-        self.play(Write(stepSizeSlope))
-        self.wait(3)
-        """
-        
+        newDots, connections = self.drawLoss(dots, coordinates, axes, newSlopeValue, newinterceptValue)
         
         
         
