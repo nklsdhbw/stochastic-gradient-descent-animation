@@ -3,6 +3,52 @@ import sympy as sp
 
 class Visualize(Scene):
     ####* Functions
+    def partialDerivative(self, coordinates, intercept, slope, axes, wrt, next_to=None):
+        derivative = r"&"
+        simplifiedDerivative = r"&"
+        totalResult = 0
+        totalResultString = r"="
+        for cords in coordinates:
+            if cords == coordinates[0]:
+                derivative += r"="
+                simplifiedDerivative += r"="
+            x, y = cords
+            if wrt == "slope":
+                derivative += rf"(-2) \cdot {x} \cdot ({intercept} + {slope} \cdot {x}) \\ & +"
+                calculation = (-2) * x * (intercept + slope * x)
+            else:
+                derivative += rf"(-2) \cdot ({intercept} + {slope} \cdot {x}) \\ & +"
+                calculation = (-2) * (intercept + slope * x)
+            totalResult += calculation
+            simplifiedDerivative += rf"{calculation} +"
+        derivative = derivative[:-1]
+        simplifiedDerivative = simplifiedDerivative[:-1]
+        simplifiedDerivative = simplifiedDerivative.replace("+-", "-")
+        totalResultString += rf"{totalResult}"
+        if wrt == "slope":
+            partial1 = self.equation(result=r"\dfrac{\partial RSS}{\partial slope}", next_to=axes, next_to_direction=RIGHT, up=2, left=0.7)
+            partial2 = self.equation(result=r"& = -2 \sum_{i=1}^{n} x_i(y_i - \hat{y}_i) \\ &", next_to=partial1, next_to_direction=RIGHT)
+        else:
+            partial1 = self.equation(result=r"\dfrac{\partial RSS}{\partial intercept}", next_to=next_to, next_to_direction=DOWN)
+            partial2 = self.equation(result=r"= -2 \sum_{i=1}^{n} (y_i - \hat{y}_i) \\ &", next_to=partial1, next_to_direction=RIGHT)
+        partial3 = self.equation(result=derivative, next_to=partial2, next_to_direction=DOWN, align_to=partial2, align_to_direction=LEFT)
+        partial4 = self.equation(result=simplifiedDerivative, next_to=partial2, next_to_direction=DOWN, align_to=partial3, align_to_direction=LEFT)
+        partial5 = self.equation(result=totalResultString, next_to=partial2, next_to_direction=DOWN, align_to=partial4, align_to_direction=LEFT)
+        # Remove last plus sign
+        self.play(Write(partial1))
+        
+        self.play(Write(partial2))
+        self.play(Write(partial3))
+        self.wait(3)
+        
+        self.play(FadeTransform(partial3, partial4))
+        self.wait(2)
+        self.play(FadeTransform(partial4, partial5))
+        self.wait()
+        self.play(FadeOut(partial2), partial5.animate.next_to(partial1, RIGHT))
+        self.wait(2)
+        return partial1, partial5, totalResult
+
     def RSS(self, coordinates, newCoordinates, next_to, next_to_direction, up=0, left=0):
         RSS1 = self.equation(result="RSS", next_to=next_to, next_to_direction=next_to_direction, up=up, left=left)
         RSS2 = self.equation(r"= \sum_{i=1}^{n} (y_i - \hat{y}_i)^2", next_to=RSS1, next_to_direction=RIGHT)
@@ -161,89 +207,24 @@ class Visualize(Scene):
 
         # Residuals sum of squares
         self.RSS(coordinates, newDotsCoordinates, next_to=axes, next_to_direction=RIGHT, up=2, left=0.7)
-
+        
 
 
         # Derivatives of RSS
-        derivativeSlope = r"&"
-        derivativeIntercept = r"&"
-        simplifiedDerivativeSlope = r"&"
-        simplifiedDerivativeIntercept = r"&"
-        totalResultSlope = 0
-        totalResultIntercept = 0
-        totalResultSlopeString = r"="
-        totalResultInterceptString = r"="
-        for cords in coordinates:
-            if cords == coordinates[0]:
-                derivativeIntercept += r"="
-                derivativeSlope += r"="
-                simplifiedDerivativeSlope += r"="
-                simplifiedDerivativeIntercept += r"="
-            x, y = cords
-            derivativeSlope += rf"(-2) \cdot {x} \cdot ({intercept} + {slope} \cdot {x}) \\ & +"
-            derivativeIntercept += rf"(-2) \cdot ({intercept} + {slope} \cdot {x}) \\ & +"
-            calculationSlope = (-2) * x * (intercept + slope * x)
-            calculationIntercept = (-2) * (intercept + slope * x)
-            totalResultSlope += calculationSlope
-            totalResultIntercept += calculationIntercept
-            simplifiedDerivativeIntercept += rf"{calculationIntercept} +"
-            simplifiedDerivativeSlope += rf"{calculationSlope} +"
-        derivativeSlope = derivativeSlope[:-1]
-        derivativeIntercept = derivativeIntercept[:-1]
-        simplifiedDerivativeIntercept = simplifiedDerivativeIntercept[:-1]
-        simplifiedDerivativeIntercept = simplifiedDerivativeIntercept.replace("+-", "-")
-        simplifiedDerivativeSlope = simplifiedDerivativeSlope[:-1]
-        simplifiedDerivativeSlope = simplifiedDerivativeSlope.replace("+-", "-")
-        totalResultSlopeString += rf"{totalResultSlope}"
-        totalResultInterceptString += rf"{totalResultIntercept}"
-        partialSlopeText1 = self.equation(result=r"\dfrac{\partial RSS}{\partial slope}", next_to=axes, next_to_direction=RIGHT, up=2, left=0.7)
-        partialSlopeText2 = self.equation(result=r"& = -2 \sum_{i=1}^{n} x_i(y_i - \hat{y}_i) \\ &", next_to=partialSlopeText1, next_to_direction=RIGHT)
-        partialSlopeText3 = self.equation(result=derivativeSlope, next_to=partialSlopeText2, next_to_direction=DOWN, align_to=partialSlopeText2, align_to_direction=LEFT)
-        partialSlopeText4 = self.equation(result=simplifiedDerivativeSlope, next_to=partialSlopeText2, next_to_direction=DOWN, align_to=partialSlopeText3, align_to_direction=LEFT)
-        partialSlopeText5 = self.equation(result=totalResultSlopeString, next_to=partialSlopeText2, next_to_direction=DOWN, align_to=partialSlopeText4, align_to_direction=LEFT)
-        # Remove last plus sign
-        self.play(Write(partialSlopeText1))
-        
-        self.play(Write(partialSlopeText2))
-        self.play(Write(partialSlopeText3))
-        self.wait(3)
-        
-        self.play(FadeTransform(partialSlopeText3, partialSlopeText4))
-        self.wait(2)
-        self.play(FadeTransform(partialSlopeText4, partialSlopeText5))
-        self.wait()
-        self.play(FadeOut(partialSlopeText2), partialSlopeText5.animate.next_to(partialSlopeText1, RIGHT))
-        self.wait(2)
+        partialSlope1, partialSlope5, totalResultSlope = self.partialDerivative(coordinates, intercept, slope, axes, "slope")
+        slopeGroup = [partialSlope1, partialSlope5]
+        slopeGroup = VGroup(*slopeGroup)
+        partialIntercept1, partialIntercept5, totalResultIntercept = self.partialDerivative(coordinates, intercept, slope, axes, "intercept", next_to=partialSlope1)
+        interceptGroup = [partialIntercept1, partialIntercept5]
+        interceptGroup = VGroup(*interceptGroup)
 
-        partialInterceptText1 = self.equation(result=r"\dfrac{\partial RSS}{\partial intercept}", next_to=partialSlopeText1, next_to_direction=DOWN)
-        partialInterceptText2 = self.equation(result=r"= -2 \sum_{i=1}^{n} (y_i - \hat{y}_i) \\ &", next_to=partialInterceptText1, next_to_direction=RIGHT)
-        partialInterceptText3 = self.equation(result=derivativeIntercept, next_to=partialInterceptText2, next_to_direction=DOWN, align_to=partialInterceptText2, align_to_direction=LEFT)
-        partialInterceptText4 = self.equation(result=simplifiedDerivativeIntercept, next_to=partialInterceptText2, next_to_direction=DOWN, align_to=partialInterceptText3, align_to_direction=LEFT)
-        partialInterceptText5 = self.equation(result=totalResultInterceptString, next_to=partialInterceptText2, next_to_direction=DOWN, align_to=partialInterceptText4, align_to_direction=LEFT)
-
-        self.play(Write(partialInterceptText1))
-        
-        self.play(Write(partialInterceptText2))
-        self.play(Write(partialInterceptText3))
-        self.wait(3)
-        
-        self.play(FadeTransform(partialInterceptText3, partialInterceptText4))
-        self.wait(3)
-        #partialSlopeText5, DERIVATIVE_SLOPE = self.partialDerivative5("slope", coordinates, 0, slope, partialSlopeText2, DOWN, 2)
-        self.play(FadeTransform(partialInterceptText4, partialInterceptText5))
-        self.wait()
-        self.play(FadeOut(partialInterceptText2), partialInterceptText5.animate.next_to(partialInterceptText1, RIGHT))
-        self.wait(2)
-        
         # clear up all objects
         objects = [axes, x_label, y_label, *dots, *newDots.values(), *connections.values(), line, linetitle]
         group = VGroup(*objects)
         self.play(FadeOut(group))
         self.wait(0.5)
-        slopeGroup = [partialSlopeText1, partialSlopeText5]
-        interceptGroup = [partialInterceptText1, partialInterceptText5]
-        slopeGroup = VGroup(*slopeGroup)
-        interceptGroup = VGroup(*interceptGroup)
+        
+        
         #group = VGroup(*derivatives)
         self.play(slopeGroup.animate.shift(LEFT*6))
         vertical_shift = slopeGroup[0].get_center()[1] - interceptGroup[0].get_center()[1]
@@ -252,7 +233,7 @@ class Visualize(Scene):
         
         
         # Gradient descent
-        stepSizeSlope = self.equation(result=r"stepSize_{Slope}", next_to=partialSlopeText1, next_to_direction=DOWN, left=-1)
+        stepSizeSlope = self.equation(result=r"stepSize_{Slope}", next_to=partialSlope1, next_to_direction=DOWN, left=-1)
         stepSizeSlope2 = self.equation(result = r"= \dfrac{\partial RSS}{\partial slope} \cdot learningRate", next_to=stepSizeSlope, next_to_direction=RIGHT)
         self.play(Write(stepSizeSlope))
         self.play(Write(stepSizeSlope2))
