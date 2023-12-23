@@ -3,6 +3,21 @@ import sympy as sp
 
 class Visualize(Scene):
     ####* Functions
+    def linearFunctionText(self, slope, intercept, next_to):
+        linearFunction1 = MathTex("y")
+        linearFunction2 = MathTex("= slope \cdot x + intercept")
+        linearFunction3 = MathTex(f"= {slope} \cdot x + {intercept}")
+        linearFunction1.next_to(next_to, RIGHT)
+        #linearFunction1.align_to(next_to, LEFT)
+        linearFunction2.next_to(linearFunction1, RIGHT)
+        linearFunction3.next_to(linearFunction2, DOWN)
+        linearFunction3.align_to(linearFunction2, LEFT)
+        self.play(Write(linearFunction1))
+        self.play(Write(linearFunction2))
+        self.play(Write(linearFunction3))
+        self.play(FadeOut(linearFunction2), linearFunction3.animate.align_to(linearFunction1, UP))
+        return linearFunction1, linearFunction3
+
     def partialDerivative(self, coordinates, intercept, slope, axes, wrt, next_to=None):
         derivative = r"&"
         simplifiedDerivative = r"&"
@@ -181,20 +196,23 @@ class Visualize(Scene):
         intercept = 0
         line, linetitle = self.graph(axes, f"{slope}*x + {intercept}")
 
-        function = MathTex("y")
-        function2 = MathTex("= slope \cdot x + intercept")
-        function3 = MathTex(f"= {slope} \cdot x + {intercept}")
-        function.next_to(axes, RIGHT)
-        function.shift(UP*2)
-        function.shift(LEFT*0.7)
-        function2.next_to(function, RIGHT)
-        function3.next_to(function2, DOWN)
-        function3.align_to(function2, LEFT)
-        self.play(Write(function), Write(function2))
-        self.play(Write(function3))
+        # Show linear function equation
+        function, function3 = self.linearFunctionText(slope, intercept, next_to=line)
+        #function = MathTex("y")
+        #function2 = MathTex("= slope \cdot x + intercept")
+        #function3 = MathTex(f"= {slope} \cdot x + {intercept}")
+        #function.next_to(axes, RIGHT)
+        #function.shift(UP*2)
+        #function.shift(LEFT*0.7)
+        #function2.next_to(function, RIGHT)
+        #function3.next_to(function2, DOWN)
+        #function3.align_to(function2, LEFT)
+        #self.play(Write(function), Write(function2))
+        #self.play(Write(function3))
         # Show regression line
         self.wait(3)
         self.play(Write(line), Write(linetitle))
+        self.play(FadeOut(function), FadeOut(function3))
 
 
 
@@ -203,7 +221,7 @@ class Visualize(Scene):
         newDots, connections, newDotsCoordinates = self.drawLoss(dots, coordinates, axes, slope, intercept)
 
         
-        self.play(FadeOut(function), FadeOut(function2), FadeOut(function3))
+        #self.play(FadeOut(function), FadeOut(function2), FadeOut(function3))
 
         # Residuals sum of squares
         self.RSS(coordinates, newDotsCoordinates, next_to=axes, next_to_direction=RIGHT, up=2, left=0.7)
@@ -306,29 +324,15 @@ class Visualize(Scene):
         stepsizes = [stepSizeSlope, stepSizeSlope4, stepSizeIntercept, stepSizeIntercept4]
         stepsizes = VGroup(*stepsizes)
         self.play(FadeOut(stepsizes))
-        linearFunction1 = MathTex("y")
-        linearFunction2 = MathTex("= slope \cdot x + intercept")
-        linearFunction3 = MathTex(f"= {newSlopeValue} \cdot x + {newinterceptValue}")
-        linearFunction1.next_to(newintercept1, DOWN)
-        linearFunction1.align_to(newintercept1, LEFT)
-        linearFunction2.next_to(linearFunction1, RIGHT)
-        linearFunction3.next_to(linearFunction2, DOWN)
-        linearFunction3.align_to(linearFunction2, LEFT)
-        self.play(Write(linearFunction1))
-        self.play(Write(linearFunction2))
-        self.play(Write(linearFunction3))
-        self.play(FadeOut(linearFunction2), linearFunction3.animate.align_to(linearFunction1, UP))
         
+        # Add linear function equation as text
+        linearFunction1, linearFunction3 = self.linearFunctionText(newSlopeValue, newinterceptValue, next_to=line)
+    
         # Clear new slopes and intercepts
         remove = [newSlope1, newSlope4, newintercept1, newintercept4]
         remove = VGroup(*remove)
         self.play(FadeOut(remove))
 
-        # Move linear function to the right
-        linearFunction = [linearFunction1, linearFunction3]
-        linearFunction = VGroup(*linearFunction)
-        self.play(linearFunction.animate.shift(RIGHT*5))
-        self.wait(2)
 
         # Show coordinate system again
 
@@ -346,7 +350,7 @@ class Visualize(Scene):
         # Create orthogonal lines
         newDots, connections, newDotsCoordinates = self.drawLoss(dots, coordinates, axes, newSlopeValue, newinterceptValue)
         self.wait(2)
-        self.play(FadeOut(linearFunction))
+        self.play(FadeOut(linearFunction1), FadeOut(linearFunction3))
         self.wait(2)
         self.RSS(coordinates, newDotsCoordinates, next_to=axes, next_to_direction=RIGHT, up=2, left=0.7)
         
