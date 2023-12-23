@@ -3,6 +3,37 @@ import sympy as sp
 
 class Visualize(Scene):
     ####* Functions
+    def RSS(self, coordinates, newCoordinates, next_to, next_to_direction, up=0, left=0):
+        RSS1 = self.equation(result="RSS", next_to=next_to, next_to_direction=next_to_direction, up=up, left=left)
+        RSS2 = self.equation(r"= \sum_{i=1}^{n} (y_i - \hat{y}_i)^2", next_to=RSS1, next_to_direction=RIGHT)
+        self.play(Write(RSS1))
+        self.play(Write(RSS2))
+        self.wait(2)
+        RSS3 = "="
+        RSS4 = "="
+        totalResult = 0
+        for cords, newCords in zip(coordinates, newCoordinates):
+            x, y = cords
+            x2, y_hat = newCords
+            y_hat = round(y_hat, 2)
+            RSS3 += rf"({y} - {y_hat})^2  \\ +"
+            result = round((y - y_hat)**2, 2)
+            RSS4 += rf"{result} +"
+            totalResult += result
+        # Remove last plus sign
+        RSS3 = RSS3[:-1]
+        RSS4 = RSS4[:-1]
+        RSS3 = self.equation(result=rf"{RSS3}", next_to=RSS2, next_to_direction=DOWN, align_to=RSS2, align_to_direction=LEFT)
+        RSS4 = self.equation(result=rf"{RSS4}", next_to=RSS2, next_to_direction=DOWN, align_to=RSS2, align_to_direction=LEFT)
+        self.play(Write(RSS3))
+        self.play(FadeTransform(RSS3, RSS4))
+        RSS5 = self.equation(result=rf"= {totalResult}", next_to=RSS2, next_to_direction=DOWN, align_to=RSS2, align_to_direction=LEFT)
+        self.play(FadeTransform(RSS4, RSS5))
+        self.wait(2)
+        self.play(FadeOut(RSS2), RSS5.animate.next_to(RSS1, RIGHT))
+        self.play(FadeOut(RSS1), FadeOut(RSS5))
+
+
     def drawCoordinateSystem(self, x_range, y_range, size):
         axes = Axes(
             x_range=x_range,
@@ -129,34 +160,7 @@ class Visualize(Scene):
         self.play(FadeOut(function), FadeOut(function2), FadeOut(function3))
 
         # Residuals sum of squares
-        RSS1 = self.equation(result="RSS", next_to=axes, next_to_direction=RIGHT, up=2, left=0.7)
-        RSS2 = self.equation(r"= \sum_{i=1}^{n} (y_i - \hat{y}_i)^2", next_to=RSS1, next_to_direction=RIGHT)
-        self.play(Write(RSS1))
-        self.play(Write(RSS2))
-        self.wait(2)
-        RSS3 = "="
-        RSS4 = "="
-        totalResult = 0
-        for cords, newCords in zip(coordinates, newDotsCoordinates):
-            x, y = cords
-            x2, y_hat = newCords
-            y_hat = round(y_hat, 2)
-            RSS3 += rf"({y} - {y_hat})^2  \\ +"
-            result = round((y - y_hat)**2, 2)
-            RSS4 += rf"{result} +"
-            totalResult += result
-        # Remove last plus sign
-        RSS3 = RSS3[:-1]
-        RSS4 = RSS4[:-1]
-        RSS3 = self.equation(result=rf"{RSS3}", next_to=RSS2, next_to_direction=DOWN, align_to=RSS2, align_to_direction=LEFT)
-        RSS4 = self.equation(result=rf"{RSS4}", next_to=RSS2, next_to_direction=DOWN, align_to=RSS2, align_to_direction=LEFT)
-        self.play(Write(RSS3))
-        self.play(FadeTransform(RSS3, RSS4))
-        RSS5 = self.equation(result=rf"= {totalResult}", next_to=RSS2, next_to_direction=DOWN, align_to=RSS2, align_to_direction=LEFT)
-        self.play(FadeTransform(RSS4, RSS5))
-        self.wait(2)
-        self.play(FadeOut(RSS2), RSS5.animate.next_to(RSS1, RIGHT))
-        self.play(FadeOut(RSS1), FadeOut(RSS5))
+        self.RSS(coordinates, newDotsCoordinates, next_to=axes, next_to_direction=RIGHT, up=2, left=0.7)
 
 
 
@@ -206,6 +210,8 @@ class Visualize(Scene):
         
         self.play(FadeTransform(partialSlopeText3, partialSlopeText4))
         self.wait(2)
+        self.play(FadeTransform(partialSlopeText4, partialSlopeText5))
+        self.wait()
         self.play(FadeOut(partialSlopeText2), partialSlopeText5.animate.next_to(partialSlopeText1, RIGHT))
         self.wait(2)
 
@@ -225,7 +231,7 @@ class Visualize(Scene):
         self.wait(3)
         #partialSlopeText5, DERIVATIVE_SLOPE = self.partialDerivative5("slope", coordinates, 0, slope, partialSlopeText2, DOWN, 2)
         self.play(FadeTransform(partialInterceptText4, partialInterceptText5))
-        self.wait(2)
+        self.wait()
         self.play(FadeOut(partialInterceptText2), partialInterceptText5.animate.next_to(partialInterceptText1, RIGHT))
         self.wait(2)
         
@@ -358,6 +364,10 @@ class Visualize(Scene):
 
         # Create orthogonal lines
         newDots, connections, newDotsCoordinates = self.drawLoss(dots, coordinates, axes, newSlopeValue, newinterceptValue)
+        self.wait(2)
+        self.play(FadeOut(linearFunction))
+        self.wait(2)
+        self.RSS(coordinates, newDotsCoordinates, next_to=axes, next_to_direction=RIGHT, up=2, left=0.7)
         
         
         
