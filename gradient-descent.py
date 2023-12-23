@@ -20,6 +20,7 @@ class Visualize(Scene):
     def drawLoss(self, dots, coordinates, axes, slope, intercept):
         perpendicular_slope = -1 / slope
         newDots = {}
+        newDotsCoordinates = []
         for dot_obj, cords in zip(dots, coordinates):
             # y = mx + b
             x, y = cords
@@ -31,6 +32,7 @@ class Visualize(Scene):
             y_value = m2 * x_value + b2
             new_dot = self.dot(axes, x_value, y_value)
             newDots[dot_obj] = new_dot
+            newDotsCoordinates.append((x_value, y_value))
 
         # Draw loss function lines
         connections = {}
@@ -39,7 +41,7 @@ class Visualize(Scene):
 
         for connection in connections.values():
             self.play(Write(connection))
-        return newDots, connections
+        return newDots, connections, newDotsCoordinates
 
     def equation(self, result, next_to, next_to_direction, align_to=None, align_to_direction=None, up=0, left=0):
         equation = MathTex(rf"{result}")
@@ -121,19 +123,42 @@ class Visualize(Scene):
 
 
         # Create orthogonal lines
-        newDots, connections = self.drawLoss(dots, coordinates, axes, slope, intercept)
+        newDots, connections, newDotsCoordinates = self.drawLoss(dots, coordinates, axes, slope, intercept)
 
         
         self.play(FadeOut(function), FadeOut(function2), FadeOut(function3))
 
         # Residuals sum of squares
-        RSS = Tex("$RSS = \sum_{i=1}^{n} (y_i - \hat{y}_i)^2$")
-        RSS.next_to(axes, RIGHT)
-        RSS.shift(UP*2)
-        RSS.shift(LEFT*0.7)
-        self.play(Write(RSS))
+        RSS1 = self.equation(result="RSS", next_to=axes, next_to_direction=RIGHT, up=2, left=0.7)
+        RSS2 = self.equation(r"= \sum_{i=1}^{n} (y_i - \hat{y}_i)^2", next_to=RSS1, next_to_direction=RIGHT)
+        self.play(Write(RSS1))
+        self.play(Write(RSS2))
         self.wait(2)
-        self.play(FadeOut(RSS))
+        RSS3 = "="
+        RSS4 = "="
+        totalResult = 0
+        for cords, newCords in zip(coordinates, newDotsCoordinates):
+            x, y = cords
+            x2, y_hat = newCords
+            y_hat = round(y_hat, 2)
+            RSS3 += rf"({y} - {y_hat})^2  \\ +"
+            result = round((y - y_hat)**2, 2)
+            RSS4 += rf"{result} +"
+            totalResult += result
+        # Remove last plus sign
+        RSS3 = RSS3[:-1]
+        RSS4 = RSS4[:-1]
+        RSS3 = self.equation(result=rf"{RSS3}", next_to=RSS2, next_to_direction=DOWN, align_to=RSS2, align_to_direction=LEFT)
+        RSS4 = self.equation(result=rf"{RSS4}", next_to=RSS2, next_to_direction=DOWN, align_to=RSS2, align_to_direction=LEFT)
+        self.play(Write(RSS3))
+        self.play(FadeTransform(RSS3, RSS4))
+        RSS5 = self.equation(result=rf"= {totalResult}", next_to=RSS2, next_to_direction=DOWN, align_to=RSS2, align_to_direction=LEFT)
+        self.play(FadeTransform(RSS4, RSS5))
+        self.wait(2)
+        self.play(FadeOut(RSS2), RSS5.animate.next_to(RSS1, RIGHT))
+        self.play(FadeOut(RSS1), FadeOut(RSS5))
+
+
 
         # Derivatives of RSS
         derivativeSlope = r"&"
@@ -332,7 +357,7 @@ class Visualize(Scene):
 
 
         # Create orthogonal lines
-        newDots, connections = self.drawLoss(dots, coordinates, axes, newSlopeValue, newinterceptValue)
+        newDots, connections, newDotsCoordinates = self.drawLoss(dots, coordinates, axes, newSlopeValue, newinterceptValue)
         
         
         
