@@ -1,4 +1,4 @@
-from manim import Scene, Text, Write, FadeOut, FadeIn, Axes, Dot, Transform, MathTex, GREEN, WHITE, RED, YELLOW, BLUE, PINK, UP, RIGHT, LEFT, DOWN, VGroup, Arrow, Create, Indicate, SurroundingRectangle, GrowArrow, GrowFromCenter, DrawBorderThenFill, BLACK
+from manim import Scene, Text, Write, FadeOut, FadeIn, Axes, Dot, Transform, MathTex, GREEN, WHITE, RED, YELLOW, BLUE, PINK, UP, RIGHT, LEFT, DOWN, VGroup, Arrow, Create, Indicate, SurroundingRectangle, GrowArrow, GrowFromCenter, DrawBorderThenFill, BLACK, MoveToTarget, ReplacementTransform, Paragraph, config
 import numpy as np
 
 class AdaGrad(Scene):
@@ -14,7 +14,7 @@ class AdaGrad(Scene):
         self.wait(2)
         self.play(FadeOut(title_group))
 
-        # Mach erst mal die Basics
+        # mach erst mal die Basics
         basic_title = Text("Basics of AdaGrad", font_size=36)
         self.play(Write(basic_title))
         self.wait(2)
@@ -93,7 +93,7 @@ class AdaGrad(Scene):
         self.play(FadeOut(title), FadeOut(new_title), FadeOut(adagrad_teil1))
 
         # animation of the AdaGrad-Algorithm
-        example_text = Text("AdaGrad sample application", font_size=36)
+        example_text = Text("AdaGrad sample application (convex)", font_size=36)
         self.play(Write(example_text))
         self.wait(2)
         self.play(FadeOut(example_text))
@@ -132,9 +132,58 @@ class AdaGrad(Scene):
 
             # update the explanation text
             new_explanation_text = MathTex(
+                f"Schritt {_+1}:",
                 f"Gradient: {gradient:.2f}",
                 f"\\quad Angepasste Lernrate: {adjusted_learning_rate:.2f}",
                 f"\\quad Position: ({start_x:.2f}, {start_x**2:.2f})",
+                font_size=24
+            ).to_edge(UP)
+
+            # dot and text animation at the same time
+            self.play(Transform(start_dot, new_dot), Transform(explanation_text, new_explanation_text))
+
+        self.wait(2)
+        self.play(FadeOut(function_curve), FadeOut(axes), FadeOut(start_dot), FadeOut(function_label), FadeOut(explanation_text))
+
+        self.non_convex_AdaGrad()
+
+    def non_convex_AdaGrad(self):
+        nonconvex_title = Text("AdaGrad sample application (non-convex)", font_size=36)
+        self.play(Write(nonconvex_title))
+        self.wait(2)
+        self.play(FadeOut(nonconvex_title))
+
+        axes = Axes(x_range=[-3, 3], y_range=[-5, 5], axis_config={"color": WHITE})
+        function_curve = axes.plot(lambda x: x**3 - 3*x, color=BLUE)
+        function_label = MathTex("f(x) = x^3 - 3x", color=BLUE).next_to(function_curve, UP)
+
+        self.play(Write(axes), Write(function_curve), Write(function_label))
+
+        start_x = 2.5
+        start_dot = Dot(axes.c2p(start_x, start_x**3 - 3*start_x), color=RED)
+        self.play(FadeIn(start_dot))
+
+        explanation_text = MathTex("", font_size=24).to_edge(UP)
+        self.play(Write(explanation_text))
+
+        # AdaGrad optimization steps
+        x = start_x
+        historical_gradient = 0
+        learning_rate = 0.5
+
+        for i in range(20):
+            gradient = 3 * x**2 - 3
+            historical_gradient += gradient ** 2
+            adjusted_learning_rate = learning_rate / (np.sqrt(historical_gradient) + 1e-8)
+            x = x - adjusted_learning_rate * gradient
+            new_dot = Dot(axes.c2p(x, x**3 - 3*x), color=RED)
+
+            # update the explanation text
+            new_explanation_text = MathTex(
+                f"Schritt {i+1}:",
+                f"Gradient: {gradient:.2f}",
+                f"\\quad Angepasste Lernrate: {adjusted_learning_rate:.2f}",
+                f"\\quad Position: ({x:.2f}, {x**3 - 3*x:.2f})",
                 font_size=24
             ).to_edge(UP)
 
@@ -185,4 +234,148 @@ class AdaGrad(Scene):
         self.play(Write(end_text))
         self.wait(2)
 
-        self.play(FadeOut(lr_group), FadeOut(gradient_group), FadeOut(end_text))
+        self.play(FadeOut(lr_group), FadeOut(gradient_group), FadeOut(end_text), FadeOut(title_explanation))
+
+        self.comparison()
+
+    def comparison(self):
+        # introduction for the following animation
+        intro_title = Text("Comparison of AdaGrad, RMSprop and Adam", font_size=36, color=GREEN).to_edge(UP)
+        intro_text = Paragraph(
+            "In the following animation, we will compare the optimization algorithms AdaGrad, RMSprop, and Adam. ",
+            "Each point represents an algorithm, and its movement on the function graph demonstrates ",
+            "how each algorithm attempts to find the minimum of the function.",
+            font_size=24,
+            line_spacing=1.5
+        ).next_to(intro_title, DOWN, buff=0.5).scale_to_fit_width(config.frame_width - 2)
+
+        self.play(Write(intro_title))
+        self.wait(1)
+        self.play(Write(intro_text))
+        self.wait(2)
+        self.play(FadeOut(intro_title), FadeOut(intro_text))
+
+        # rmsprop explanation
+        rmsprop_title = Text("RMSprop", font_size=36, color=GREEN).to_edge(UP)
+        rmsprop_text = Paragraph(
+            "RMSprop (Root Mean Square Propagation) is an adaptive learning rate method. ",
+            "It was designed to resolve the diminishing learning rates of AdaGrad. ",
+            "RMSprop adjusts the learning rate by dividing it with an exponentially ",
+            "decaying average of squared gradients.",
+            font_size=24,
+            line_spacing=1.5
+        ).next_to(rmsprop_title, DOWN, buff=0.5).scale_to_fit_width(config.frame_width - 2)
+
+        self.play(Write(rmsprop_title))
+        self.wait(1)
+        self.play(Write(rmsprop_text))
+        self.wait(2)
+        self.play(FadeOut(rmsprop_title), FadeOut(rmsprop_text))
+
+        # adam explanation
+        adam_title = Text("Adam", font_size=36, color=BLUE).to_edge(UP)
+        adam_text = Paragraph(
+            "Adam (Adaptive Moment Estimation) combines the ideas of RMSprop and momentum. ",
+            "It keeps an exponentially decaying average of past gradients (like RMSprop) ",
+            "and also keeps an exponentially decaying average of past squared gradients. ",
+            "This makes it effective for problems with noisy or sparse gradients.",
+            font_size=24,
+            line_spacing=1.5
+        ).next_to(adam_title, DOWN, buff=0.5).scale_to_fit_width(config.frame_width - 2)
+
+        self.play(Write(adam_title))
+        self.wait(1)
+        self.play(Write(adam_text))
+        self.wait(2)
+        self.play(FadeOut(adam_title), FadeOut(adam_text))
+
+        # definition of the functions and of the gradient
+        def func(x):
+            return x**2
+
+        def grad_func(x):
+            return 2 * x
+
+        # initialisation of the variables
+        start_x = 2
+        lr = 0.1
+        epsilon = 1e-8
+        adagrad_cache = 0
+        decay_rate = 0.99
+        rmsprop_cache = 0 # rmsprop specific
+        beta1 = 0.9 # adam specific
+        beta2 = 0.999 # adam specific
+        m = 0 # adam specific
+        v = 0 # adam specific
+
+        # create axes and function
+        axes = Axes(x_range=[-3, 3], y_range=[-1, 9])
+        graph = axes.plot(func, color=WHITE)
+        self.add(axes, graph)
+
+        # initialise the dots for adagrad, rmsprop and adam
+        adagrad_dot = Dot(color=RED).move_to(axes.c2p(start_x, func(start_x)))
+        rmsprop_dot = Dot(color=GREEN).move_to(axes.c2p(start_x, func(start_x)))
+        adam_dot = Dot(color=BLUE).move_to(axes.c2p(start_x, func(start_x)))
+
+        # create text labels for the dots
+        adagrad_label = Text("AdaGrad", font_size=20, color=RED).next_to(adagrad_dot, UP+RIGHT)
+        rmsprop_label = Text("RMSprop", font_size=20, color=GREEN).next_to(rmsprop_dot, UP+RIGHT)
+        adam_label = Text("Adam", font_size=20, color=BLUE).next_to(adam_dot, UP+RIGHT)
+
+        self.add(adagrad_dot, rmsprop_dot, adam_dot, adagrad_label, rmsprop_label, adam_label)
+
+        # create a descriptive text for the animation
+        description = Text("Initializing optimization algorithms", font_size=24).to_edge(UP)
+        self.add(description)
+
+        # loop for the animation
+        for i in range(10):
+            # update the descriptive text
+            if i == 5:
+                self.play(ReplacementTransform(description, Text("Optimizing...", font_size=24).to_edge(UP)))
+                description = Text("Optimizing...", font_size=24).to_edge(UP)
+
+            grad = grad_func(start_x)
+
+        # loop for the animation
+        for _ in range(10):
+            grad = grad_func(start_x)
+            # adagrad update
+            adagrad_cache += grad**2
+            start_x -= lr * grad / (np.sqrt(adagrad_cache) + epsilon)
+            new_adagrad_dot = Dot(color=RED).move_to(axes.c2p(start_x, func(start_x)))
+            new_adagrad_label = Text("AdaGrad", font_size=20, color=RED).next_to(new_adagrad_dot, UP+RIGHT)
+            
+            # rmsprop update
+            rmsprop_cache = decay_rate * rmsprop_cache + (1 - decay_rate) * grad**2
+            start_x -= lr * grad / (np.sqrt(rmsprop_cache) + epsilon)
+            new_rmsprop_dot = Dot(color=GREEN).move_to(axes.c2p(start_x, func(start_x)))
+            new_rmsprop_label = Text("RMSprop", font_size=20, color=GREEN).next_to(new_rmsprop_dot, UP+RIGHT)
+
+            # adam update
+            m = beta1 * m + (1 - beta1) * grad
+            mt = m / (1 - beta1)
+            v = beta2 * v + (1 - beta2) * (grad**2)
+            vt = v / (1 - beta2)
+            start_x -= lr * mt / (np.sqrt(vt) + epsilon)
+            new_adam_dot = Dot(color=BLUE).move_to(axes.c2p(start_x, func(start_x)))
+            new_adam_label = Text("Adam", font_size=20, color=BLUE).next_to(new_adam_dot, UP+RIGHT)
+
+            self.play(
+                ReplacementTransform(adagrad_dot, new_adagrad_dot),
+                ReplacementTransform(rmsprop_dot, new_rmsprop_dot),
+                ReplacementTransform(adam_dot, new_adam_dot),
+                ReplacementTransform(adagrad_label, new_adagrad_label),
+                ReplacementTransform(rmsprop_label, new_rmsprop_label),
+                ReplacementTransform(adam_label, new_adam_label),
+                run_time=0.5
+            )
+
+            # update to the new dots and labels
+            adagrad_dot, rmsprop_dot, adam_dot = new_adagrad_dot, new_rmsprop_dot, new_adam_dot
+            adagrad_label, rmsprop_label, adam_label = new_adagrad_label, new_rmsprop_label, new_adam_label
+
+        self.wait(2)
+        self.play(FadeOut(description))
+        self.play(FadeOut(axes), FadeOut(graph), FadeOut(adagrad_dot), FadeOut(rmsprop_dot), FadeOut(adam_dot), FadeOut(adagrad_label), FadeOut(rmsprop_label), FadeOut(adam_label), FadeOut(description))
