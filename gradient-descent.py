@@ -1,4 +1,4 @@
-from manim import Create, Write, FadeIn, Axes, UP, Tex, WHITE, GREEN, Scene, Dot, DashedLine, YELLOW, RED, BLUE, DOWN, LEFT, VGroup, RIGHT, FadeOut, MathTex, Transform, FadeTransform, ReplacementTransform
+from manim import Create, Write, FadeIn, Axes, UP, Tex, WHITE, GREEN, Scene, Dot, DashedLine, YELLOW, RED, BLUE, DOWN, LEFT, VGroup, RIGHT, FadeOut, MathTex, Transform, FadeTransform, ReplacementTransform, Arrow, GrowArrow, GREY
 import sympy as sp
 
 class Visualize(Scene):
@@ -8,7 +8,6 @@ class Visualize(Scene):
         linearFunction2 = MathTex("= slope \cdot x + intercept")
         linearFunction3 = MathTex(f"= {slope} \cdot x + {intercept}")
         linearFunction1.next_to(next_to, RIGHT)
-        #linearFunction1.align_to(next_to, LEFT)
         linearFunction2.next_to(linearFunction1, RIGHT)
         linearFunction3.next_to(linearFunction2, DOWN)
         linearFunction3.align_to(linearFunction2, LEFT)
@@ -198,18 +197,6 @@ class Visualize(Scene):
 
         # Show linear function equation
         function, function3 = self.linearFunctionText(slope, intercept, next_to=line)
-        #function = MathTex("y")
-        #function2 = MathTex("= slope \cdot x + intercept")
-        #function3 = MathTex(f"= {slope} \cdot x + {intercept}")
-        #function.next_to(axes, RIGHT)
-        #function.shift(UP*2)
-        #function.shift(LEFT*0.7)
-        #function2.next_to(function, RIGHT)
-        #function3.next_to(function2, DOWN)
-        #function3.align_to(function2, LEFT)
-        #self.play(Write(function), Write(function2))
-        #self.play(Write(function3))
-        # Show regression line
         self.wait(3)
         self.play(Write(line), Write(linetitle))
         self.play(FadeOut(function), FadeOut(function3))
@@ -219,9 +206,6 @@ class Visualize(Scene):
 
         # Create orthogonal lines
         newDots, connections, newDotsCoordinates = self.drawLoss(dots, coordinates, axes, slope, intercept)
-
-        
-        #self.play(FadeOut(function), FadeOut(function2), FadeOut(function3))
 
         # Residuals sum of squares
         self.RSS(coordinates, newDotsCoordinates, next_to=axes, next_to_direction=RIGHT, up=2, left=0.7)
@@ -353,6 +337,120 @@ class Visualize(Scene):
         self.play(FadeOut(linearFunction1), FadeOut(linearFunction3))
         self.wait(2)
         self.RSS(coordinates, newDotsCoordinates, next_to=axes, next_to_direction=RIGHT, up=2, left=0.7)
+
+        # Clear objects
+        objects = [axes, x_label, y_label, *dots, *newDots.values(), *connections.values(), line, linetitle]
+        group = VGroup(*objects)
+        self.play(FadeOut(group))
+
+
+        #! Stochastic gradient descent
+        why_sgd = Tex(r"Why Stochastic Gradient Descent?", color=WHITE)
+        self.play(Create(why_sgd))
+        self.wait(1)
+        self.play(FadeOut(why_sgd))
+
+        set1 = Tex(r"Imagine we had a more complicated model, like a Logistic Regression that used 23,000 genes to predict if someone will have a disease?").scale(0.8)
+        set2 = Tex(r"Then we would have 23,000 derivatives to plug the data into.").scale(0.8)
+        set3 = Tex(r"And what if we had data from 1,000,000 samples?").scale(0.8)
+
+        VGroup(set1, set2, set3).arrange(DOWN)
+        self.play(Write(set1))
+        self.wait(2)
+        self.play(FadeIn(set2, shift=DOWN))
+        self.wait(2)
+        self.play(FadeIn(set3, shift=DOWN))
+        self.wait(2)
+        self.play(FadeOut(set1), FadeOut(set2), FadeOut(set3))
+        self.wait(1)
+        set4 = Tex(r"Then we would have to calculate 1,000,000 terms for each of the 23,000 derivatives.").scale(0.8)
+        set5 = Tex(r"In other words, we'd have to calculate 23,000,000,000 terms for each step.").scale(0.8)
+        set6 = Tex(r"And since it is common to take at least 1,000 steps, we would calculate at least 2,300,000,000,000 terms.").scale(0.8) 
+        VGroup(set4, set5, set6).arrange(DOWN)
+        self.play(Write(set4))
+        self.wait(2)
+        self.play(FadeIn(set5, shift=DOWN))
+        self.wait(2)
+        self.play(FadeIn(set6, shift=DOWN))
+        self.wait(2)
+        self.play(FadeOut(set4), FadeOut(set5), FadeOut(set6))
+        self.wait(1)
+        set7 = Tex(r"So, for BIG DATA, Gradient Descent is slow.").scale(0.8)
+        set8 = Tex(r"This is where Stochastic Gradient Descent comes in handy.").scale(0.8)
+        VGroup(set7, set8).arrange(DOWN)
+        self.play(Write(set7))
+        self.wait(2)
+        self.play(FadeIn(set8, shift=DOWN))
+        self.wait(2)
+        self.play(FadeOut(set7), FadeOut(set8))
+        self.wait(1)
         
-        
+
+        # Create axes
+        axes, x_label, y_label = self.drawCoordinateSystem(x_range=[0, 5], y_range=[0, 5], size=6)
+
+        # Create dots
+        dots = []
+        coordinates = [(1, 2), (2, 4), (3, 3)]
+        for x, y in coordinates:
+            dots.append(self.dot(axes, x, y))
+
+        # Create a title for the coordinate system
+        title = Tex("Simple Example", color=BLUE).scale(0.8)
+        title.next_to(axes, UP, buff=0.5)
+
+        # Show coordinate system and dots
+        self.play(Create(axes), Write(x_label), Write(y_label), Write(title))
+        for dot in dots:
+            self.play(Write(dot))
+        self.wait(2)
+
+        # Move coordinate system to the left all at the same time
+        group = VGroup(axes, x_label, y_label, *dots)
+        group.scale(0.6)
+        self.play(group.animate.shift(DOWN, LEFT*3))
+        self.wait(3)
+
+        # Example: Add an arrow pointing to the first dot with explanation
+        target_dot = dots[0]
+
+        # Grey out other dots
+        for dot in dots:
+            if dot != target_dot:
+                dot.set_color(GREY)
+
+        # Create an arrow
+        arrow = Arrow(start=2*UP+2*LEFT, end=target_dot.get_center(), buff=0.1, color=BLUE)
+
+        # Create explanatory text
+        explanation = Tex(r"Stochastic Gradient Descent would randomly pick one sample for each step…", color=WHITE).scale(0.5)
+        explanation.next_to(arrow.get_start(), UP, buff=0.1)
+
+        # Add the arrow and text to the scene
+        self.play(GrowArrow(arrow), Write(explanation))
+        self.wait(2)
+
+        # Optional: Additional explanatory text
+        explanation2 = Tex(r"...and just use that one sample to calculate the derivatives.", color=WHITE).scale(0.5)
+        explanation2.next_to(arrow.get_start(), UP, buff=0.1)
+        self.play(FadeOut(explanation))
+        self.play(Write(explanation2))
+        self.wait(2)
+        self.play(FadeOut(explanation2), FadeOut(arrow))
+
+        # Create the derivative equation parts
+        partialSlope1, partialSlope5, totalResultSlope = self.partialDerivative([coordinates[0]], intercept, slope, axes, "slope")
+        # Create arrows
+        # Since we cannot target the exact submobject, we will approximate the position manually
+        # Adjust the arrow's end positions as needed to accurately point to 'Height' and 'Weight'
+        #arrow_to_height_end = equation_part2.get_center() + LEFT * 1.8   # These values are examples; adjust as needed
+        #arrow_to_weight_end = equation_part2.get_center() + RIGHT * 2 + DOWN * 0.2   # These values are examples; adjust as needed
+
+        #arrow_to_height = Arrow(start=dots[0].get_center(), end=arrow_to_height_end, buff=0.1, color=BLUE)
+        #arrow_to_weight = Arrow(start=dots[0].get_center(), end=arrow_to_weight_end, buff=0.1, color=BLUE)
+
+        # Display the arrows
+        #self.play(GrowArrow(arrow_to_height), GrowArrow(arrow_to_weight))
+        #self.wait(2)
+        #self.play(FadeOut(arrow_to_height), FadeOut(arrow_to_weight))
         
