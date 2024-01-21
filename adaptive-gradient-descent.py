@@ -1,4 +1,8 @@
-from manim import Scene, Text, Write, FadeOut, FadeIn, Axes, Dot, Transform, MathTex, GREEN, WHITE, RED, YELLOW, BLUE, PINK, UP, RIGHT, LEFT, DOWN, VGroup, Arrow, Create, Indicate, SurroundingRectangle, GrowArrow, GrowFromCenter, DrawBorderThenFill, BLACK, MoveToTarget, ReplacementTransform, Paragraph, config, LaggedStart, PURPLE, ORANGE
+from manim import *
+# Scene, Text, Write, FadeOut, FadeIn, Axes, Dot, Transform, MathTex, GREEN, WHITE, RED, YELLOW, BLUE, PINK, 
+# UP, RIGHT, LEFT, DOWN, VGroup, Arrow, Create, Indicate, SurroundingRectangle, GrowArrow, GrowFromCenter, 
+# DrawBorderThenFill, BLACK, MoveToTarget, ReplacementTransform, Paragraph, config, LaggedStart, PURPLE, ORANGE, 
+# ThreeDAxes, Surface, BLUE_E, DEGREES, ThreeDScene
 import numpy as np
 
 # use to render the scene: manim -pql adaptive-gradient-descent.py or manim -pqh adaptive-gradient-descent.py
@@ -53,6 +57,7 @@ class AdaGrad(Scene):
         self.play(FadeOut(concept_title))
         self.wait(3)
 
+        # formula of AdaGrad
         adagrad_formula = MathTex(
             r"AdaGrad \text{ automatically adjusts the learning rate: }",
             r"\eta_{t,i} = \frac{\eta}{\sqrt{\sum_{\tau=1}^t g_{\tau,i}^2 + \epsilon}}",
@@ -82,12 +87,16 @@ class AdaGrad(Scene):
         ).to_edge(UP)
         self.play(Write(new_title))
 
-        # create variables for the explanation
+        # formula of AdaGrad
         adagrad_formula = MathTex(
             r"\eta_{t,i} = \frac{\eta}{\sqrt{\sum_{\tau=1}^t g_{\tau,i}^2 + \epsilon}}",
             font_size=30
         ).shift(UP)
 
+        self.play(Write(adagrad_formula))
+        self.wait(2)
+
+        # define different components of the formula
         learning_rate_desc = MathTex(
             r"\text{Initial learning rate } \eta",
             font_size=24
@@ -96,7 +105,7 @@ class AdaGrad(Scene):
         sqrt_desc = MathTex(
             r"\text{Adjustment based on historical gradients}",
             font_size=24
-        ).next_to(adagrad_formula, DOWN, buff=1)
+        ).next_to(learning_rate_desc, DOWN, aligned_edge=LEFT)
 
         gradient_sum_desc = MathTex(
             r"\sum_{\tau=1}^t g_{\tau,i}^2 \text{: Sum of the squared gradients}",
@@ -108,38 +117,59 @@ class AdaGrad(Scene):
             font_size=24
         ).next_to(gradient_sum_desc, DOWN, aligned_edge=LEFT)
 
+        # animation of the different components
+        self.play(Transform(adagrad_formula[0][13:16], learning_rate_desc))
+        self.wait(2)
+        self.play(Transform(adagrad_formula[0][22:31], gradient_sum_desc))
+        self.wait(2)
+        self.play(Transform(adagrad_formula[0][34:35], epsilon_desc))
+        self.wait(2)
+
+        # create boxes around the different components
+        adagrad_formula_box = SurroundingRectangle(adagrad_formula, color=WHITE)
+        learning_rate_desc_box = SurroundingRectangle(learning_rate_desc, color=WHITE)
+        sqrt_desc_box = SurroundingRectangle(sqrt_desc, color=WHITE)
+        gradient_sum_desc_box = SurroundingRectangle(gradient_sum_desc, color=WHITE)
+        epsilon_desc_box = SurroundingRectangle(epsilon_desc, color=WHITE)
+
         # animation of the variables
-        self.play(Write(adagrad_formula))
+        self.play(Write(adagrad_formula), Create(adagrad_formula_box))
         self.wait(2)
-        self.play(Write(learning_rate_desc))
+        self.play(Write(learning_rate_desc), Create(learning_rate_desc_box))
         self.wait(2)
-        self.play(Write(sqrt_desc))
+        self.play(Write(sqrt_desc), Create(sqrt_desc_box))
         self.wait(2)
-        self.play(Write(gradient_sum_desc))
+        self.play(Write(gradient_sum_desc), Create(gradient_sum_desc_box))
         self.wait(2)
-        self.play(Write(epsilon_desc))
+        self.play(Write(epsilon_desc), Create(epsilon_desc_box))
         self.wait(2)
 
         # group all elements together to let them all fade out at once
         all_elements = VGroup(adagrad_formula, learning_rate_desc, sqrt_desc, gradient_sum_desc, epsilon_desc)
-        self.play(FadeOut(all_elements))
+        self.play(FadeOut(all_elements), FadeOut(adagrad_formula_box), FadeOut(learning_rate_desc_box), FadeOut(sqrt_desc_box), FadeOut(gradient_sum_desc_box), FadeOut(epsilon_desc_box))
         self.play(FadeOut(title), FadeOut(new_title), FadeOut(adagrad_teil1))
 
-        # Advantages of AdaGrad
+        # transitional text to the advantages and disadvantages
+        adv_title = Text("Now, let's take a look at the advantages and disadvantages of AdaGrad!", font_size=36, color=BLUE)
+        self.play(FadeIn(adv_title))
+        self.play(concept_title.animate.to_edge(UP, buff=1))
+        self.wait(2)
+
+        # advantages of AdaGrad
         advantages_title = Text("Advantages of AdaGrad", font_size=36, color=GREEN)
         self.play(FadeIn(advantages_title))
         self.play(advantages_title.animate.to_edge(UP, buff=1))
         self.wait(2)
 
-        advantage1 = Text("Automatically adjusts the learning rate", font_size=24).next_to(advantages_title, DOWN, aligned_edge=LEFT)
-        advantage2 = Text("Suitable for non-stationary problems", font_size=24).next_to(advantage1, DOWN, aligned_edge=LEFT)
-        advantage3 = Text("Reduces the need for manual tuning", font_size=24).next_to(advantage2, DOWN, aligned_edge=LEFT)
+        advantage1 = Text("Automatically adjusts the learning rate", font_size=24, color=GREEN).next_to(advantages_title, DOWN, aligned_edge=LEFT)
+        advantage2 = Text("Suitable for non-stationary problems", font_size=24, color=GREEN).next_to(advantage1, DOWN, aligned_edge=LEFT)
+        advantage3 = Text("Reduces the need for manual tuning", font_size=24, color=GREEN).next_to(advantage2, DOWN, aligned_edge=LEFT)
 
-        self.play(FadeIn(advantage1))
+        self.play(Write(advantage1))
         self.wait(2)
-        self.play(FadeIn(advantage2))
+        self.play(Write(advantage2))
         self.wait(2)
-        self.play(FadeIn(advantage3))
+        self.play(Write(advantage3))
         self.wait(3)
         self.play(FadeOut(advantage3))
         self.wait(1)
@@ -150,21 +180,21 @@ class AdaGrad(Scene):
         self.play(FadeOut(advantages_title))
         self.wait(3)
 
-        # Disadvantages of AdaGrad
-        disadvantages_title = Text("Disadvantages of AdaGrad", font_size=36, color=PURPLE)
+        # disadvantages of AdaGrad
+        disadvantages_title = Text("Disadvantages of AdaGrad", font_size=36, color=RED)
         self.play(FadeIn(disadvantages_title))
         self.play(disadvantages_title.animate.to_edge(UP, buff=1))
         self.wait(3)
 
-        disadvantage1 = Text("Risk of learning rate reducing too quickly", font_size=24).next_to(disadvantages_title, DOWN, aligned_edge=LEFT)
-        disadvantage2 = Text("Can be suboptimal in deep networks", font_size=24).next_to(disadvantage1, DOWN, aligned_edge=LEFT)
-        disadvantage3 = Text("Requires fine-tuning of ε", font_size=24).next_to(disadvantage2, DOWN, aligned_edge=LEFT)
+        disadvantage1 = Text("Risk of learning rate reducing too quickly", font_size=24, color=RED).next_to(disadvantages_title, DOWN, aligned_edge=LEFT)
+        disadvantage2 = Text("Can be suboptimal in deep networks", font_size=24, color=RED).next_to(disadvantage1, DOWN, aligned_edge=LEFT)
+        disadvantage3 = Text("Requires fine-tuning of ε", font_size=24, color=RED).next_to(disadvantage2, DOWN, aligned_edge=LEFT)
 
-        self.play(FadeIn(disadvantage1))
+        self.play(Write(disadvantage1))
         self.wait(2)
-        self.play(FadeIn(disadvantage2))
+        self.play(Write(disadvantage2))
         self.wait(2)
-        self.play(FadeIn(disadvantage3))
+        self.play(Write(disadvantage3))
         self.wait(2)
         self.play(FadeOut(disadvantage3))
         self.wait(1)
@@ -175,6 +205,7 @@ class AdaGrad(Scene):
         self.play(FadeOut(disadvantages_title))
         self.wait(3)
 
+
         self.convex_AdaGrad()
 
 ##############################################################################################################
@@ -182,7 +213,7 @@ class AdaGrad(Scene):
 ##############################################################################################################
 
     def convex_AdaGrad(self):
-        # Transition to practical application
+        # transition to practical application
         transition_text = Text("Now, let's move to the practical application of AdaGrad...", font_size=36, color=ORANGE)
         self.play(Write(transition_text))
         self.wait(3)
@@ -248,6 +279,7 @@ class AdaGrad(Scene):
 ##############################################################################################################
 
     def non_convex_AdaGrad(self):
+        # same as before, but with a non-convex function
         nonconvex_title = Text("AdaGrad sample application (non-convex)", font_size=36)
         self.play(Write(nonconvex_title))
         self.wait(3)
@@ -486,4 +518,72 @@ class AdaGrad(Scene):
 
         self.wait(3)
         self.play(FadeOut(description))
-        self.play(FadeOut(axes), FadeOut(graph), FadeOut(adagrad_dot), FadeOut(rmsprop_dot), FadeOut(adam_dot), FadeOut(adagrad_label), FadeOut(rmsprop_label), FadeOut(adam_label), FadeOut(description))
+        self.play(FadeOut(axes), FadeOut(graph), FadeOut(adagrad_dot), FadeOut(rmsprop_dot), FadeOut(adam_dot), FadeOut(adagrad_label), FadeOut(rmsprop_label), FadeOut(adam_label))
+
+        self.three_d_animation()
+
+    # maybe keep this, because it isn't working properly
+    def three_d_animation(self):
+        self.renderer.camera_class = ThreeDCamera
+
+        axes = ThreeDAxes()
+
+        transition_text2 = Text("How does it look in 3D?", font_size=36, color=ORANGE)
+        self.play(Write(transition_text2))
+        self.wait(3)
+        self.play(FadeOut(transition_text2))
+
+        self.wait(2)
+
+        transition_text3 = Text("Let's find out!", font_size=36, color=ORANGE)
+        self.play(Write(transition_text3))
+        self.wait(3)
+        self.play(FadeOut(transition_text3))
+
+        def func(x, y):
+            return np.sin(np.sqrt(x**2 + y**2))
+        
+        def grad_func(x, y):
+            # Berechnen der partiellen Ableitungen der Funktion
+            r = np.sqrt(x**2 + y**2)
+            df_dx = (x/r) * np.cos(r)
+            df_dy = (y/r) * np.cos(r)
+            return np.array([df_dx, df_dy])
+
+        surface = Surface(
+            lambda u, v: axes.c2p(u, v, func(u, v)),
+            u_range=[-2, 2],
+            v_range=[-2, 2],
+            resolution=(30, 30)
+        )
+
+        surface.set_style(fill_opacity=0.5, fill_color=BLUE_E, stroke_color=BLUE_E)
+        self.add(axes, surface)
+
+        start_point = np.array([1.5, 1.5, func(1.5, 1.5)])
+        adagrad_dot = Dot(axes.c2p(*start_point), color=RED)
+        rmsprop_dot = Dot(axes.c2p(*start_point), color=GREEN)
+        adam_dot = Dot(axes.c2p(*start_point), color=YELLOW)
+
+        self.play(FadeIn(adagrad_dot), FadeIn(rmsprop_dot), FadeIn(adam_dot))
+        self.wait(1)
+
+        learning_rate = 0.1
+        epsilon = 1e-8
+        historical_gradient = np.zeros(2)
+
+        for _ in range(10):
+            x, y, _ = adagrad_dot.get_center()
+            gradient = grad_func(x, y)
+            historical_gradient += gradient**2
+            adjusted_lr = learning_rate / (np.sqrt(historical_gradient) + epsilon)
+            new_point = np.array([x, y]) - adjusted_lr * gradient
+            new_adagrad_pos = axes.c2p(new_point[0], new_point[1], func(*new_point))
+
+            self.play(
+                adagrad_dot.animate.move_to(new_adagrad_pos),
+                run_time=1
+            )
+
+        self.wait(2)
+        self.play(FadeOut(adagrad_dot), FadeOut(rmsprop_dot), FadeOut(adam_dot), FadeOut(surface), FadeOut(axes)) 
