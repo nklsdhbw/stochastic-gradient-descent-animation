@@ -1,4 +1,4 @@
-# 🎥 Election manifestos analysis
+# 🎥 Stochastic Gradient Descent Animation
 As part of the Integrationsemianr module at the DHBW Mannheim, an explanatory video on the Stochastic Gradient Descent Algorithm was created using the Python library Manim.
 
 ## ✍🏼 Contributors
