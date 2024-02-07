@@ -211,7 +211,7 @@ class Visualize(Scene):
         self.play(Write(eq1))
         explanation = self.explanation(r"And the goal is to find the optimal values \\ for the \textbf{intercept} and \textbf{slope}", next_to=axes, next_to_direction=UP, wait=3)
         self.play(FadeOut(eq1))
-        explanation = self.explanation(r"For example, if we started with the \\ \textbf{intercept = 0} and the \textbf{slope = 1}...", next_to=axes, next_to_direction=UP, wait=3)
+        explanation = self.explanation(r"For example, if we started with the \\ \textbf{intercept = 0} and the \textbf{slope = 1.5}...", next_to=axes, next_to_direction=UP, wait=3)
         # Create regression line
         slope = 1.5
         intercept = 0
