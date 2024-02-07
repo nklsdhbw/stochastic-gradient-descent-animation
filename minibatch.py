@@ -50,7 +50,7 @@ class SGDMiniBatch(Scene):
         return partial1, partial5, totalResult
 
     def explanation(self, text, next_to, next_to_direction, wait=0, fadeOut=True):
-        explanation = Tex(text,color=WHITE).scale(0.5)
+        explanation = Tex(text,color=WHITE).scale(0.9)
         explanation.next_to(next_to, UP)
         explanation.shift(UP)
         self.play(Write(explanation))
@@ -70,7 +70,7 @@ class SGDMiniBatch(Scene):
         return graph, title
 
     def equation(self, result, next_to, next_to_direction, align_to=None, align_to_direction=None, up=0, left=0):
-        equation = MathTex(rf"{result}").scale(0.5)
+        equation = MathTex(rf"{result}").scale(0.9)
         equation.next_to(next_to, next_to_direction)
         if align_to != None:
             equation.align_to(align_to, align_to_direction)
@@ -104,11 +104,11 @@ class SGDMiniBatch(Scene):
 
         # Move coordinate system to the left all at the same time
         group = VGroup(axes, x_label, y_label, *dots)
-        group.scale(0.6)
         
         # Show coordinate system and dots
         self.play(Write(group))
-        self.play(group.animate.shift(DOWN, LEFT*3))
+        #self.play(group.animate.shift(LEFT*3))
+        #self.play(group.move_to, LEFT*3)
         self.wait(2)
         
 
