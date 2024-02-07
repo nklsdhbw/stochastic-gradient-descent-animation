@@ -3,11 +3,58 @@ import sympy as sp
 
 class SGDMiniBatch(Scene):
     ####* Functions
+    def partialDerivative(self, coordinates, intercept, slope, axes, wrt, next_to=None):
+        derivative = r"&"
+        simplifiedDerivative = r"&"
+        totalResult = 0
+        totalResultString = r"="
+        for cords in coordinates:
+            if cords == coordinates[0]:
+                derivative += r"="
+                simplifiedDerivative += r"="
+            x, y = cords
+            if wrt == "slope":
+                derivative += rf"(-2) \cdot {x} \cdot ({intercept} + {slope} \cdot {x}) \\ & +"
+                calculation = (-2) * x * (intercept + slope * x)
+            else:
+                derivative += rf"(-2) \cdot ({intercept} + {slope} \cdot {x}) \\ & +"
+                calculation = (-2) * (intercept + slope * x)
+            totalResult += calculation
+            simplifiedDerivative += rf"{calculation} +"
+        derivative = derivative[:-1]
+        simplifiedDerivative = simplifiedDerivative[:-1]
+        simplifiedDerivative = simplifiedDerivative.replace("+-", "-")
+        totalResultString += rf"{totalResult}"
+        if wrt == "slope":
+            partial1 = self.equation(result=r"\dfrac{\partial RSS}{\partial slope}", next_to=axes, next_to_direction=RIGHT, up=2, left=0.7)
+            partial2 = self.equation(result=r"& = -2 \sum_{i=1}^{n} x_i(y_i - \hat{y}_i) \\ &", next_to=partial1, next_to_direction=RIGHT)
+        else:
+            partial1 = self.equation(result=r"\dfrac{\partial RSS}{\partial intercept}", next_to=next_to, next_to_direction=DOWN)
+            partial2 = self.equation(result=r"= -2 \sum_{i=1}^{n} (y_i - \hat{y}_i) \\ &", next_to=partial1, next_to_direction=RIGHT)
+        partial3 = self.equation(result=derivative, next_to=partial2, next_to_direction=DOWN, align_to=partial2, align_to_direction=LEFT)
+        partial4 = self.equation(result=simplifiedDerivative, next_to=partial2, next_to_direction=DOWN, align_to=partial3, align_to_direction=LEFT)
+        partial5 = self.equation(result=totalResultString, next_to=partial2, next_to_direction=DOWN, align_to=partial4, align_to_direction=LEFT)
+        # Remove last plus sign
+        self.play(Write(partial1))
+        
+        self.play(Write(partial2))
+        self.play(Write(partial3))
+        self.wait(3)
+        
+        self.play(FadeTransform(partial3, partial4))
+        self.wait(1)
+        self.play(FadeTransform(partial4, partial5))
+        self.wait(1)
+        self.play(FadeOut(partial2), partial5.animate.next_to(partial1, RIGHT))
+        self.wait(1)
+        return partial1, partial5, totalResult
 
     def explanation(self, text, next_to, next_to_direction, wait=0, fadeOut=True):
         explanation = Tex(text,color=WHITE).scale(0.5)
-        explanation.next_to(next_to, next_to_direction)
+        explanation.next_to(next_to, UP)
+        explanation.shift(UP)
         self.play(Write(explanation))
+        self.wait(wait)
         if fadeOut:
             self.play(FadeOut(explanation))
         return explanation
@@ -23,7 +70,7 @@ class SGDMiniBatch(Scene):
         return graph, title
 
     def equation(self, result, next_to, next_to_direction, align_to=None, align_to_direction=None, up=0, left=0):
-        equation = MathTex(rf"{result}")
+        equation = MathTex(rf"{result}").scale(0.5)
         equation.next_to(next_to, next_to_direction)
         if align_to != None:
             equation.align_to(align_to, align_to_direction)
@@ -66,9 +113,9 @@ class SGDMiniBatch(Scene):
         
 
         ####* Explanation
-        explanation = self.explanation(r"Note: The strict definition of Stochastic Gradient Descent \\ is to only use 1 sample per step...", axes, RIGHT, 2)
-        explanation = self.explanation(r"...however, it's more common to use a small subset of data, \\ or \textbf{mini-batch}, for each step", axes, RIGHT, 2)
-        explanation = self.explanation(r"For example we could use \textbf{3} samples per step instead \\ of just \textbf{1}", axes, RIGHT, fadeOut=False)
+        explanation = self.explanation(r"Note: The strict definition of Stochastic Gradient Descent \\ is to only use 1 sample per step...", axes, UP, wait=7)
+        explanation = self.explanation(r"...however, it's more common to use a small subset of data, \\ or \textbf{mini-batch}, for each step", axes, UP, wait=6)
+        explanation = self.explanation(r"For example we could use \textbf{3} samples per step instead \\ of just \textbf{1}", axes, UP, fadeOut=False, wait=3)
 
         targetDots = [dots[0].set_color(GREEN), dots[4].set_color("GREEN"), dots[8].set_color("GREEN")]
         arrows = [Arrow(start=DOWN+LEFT*0.6+UP*0.1, end=dot.get_center(), buff=0.1, color=BLUE) for dot in targetDots]
@@ -76,30 +123,107 @@ class SGDMiniBatch(Scene):
         self.wait(2)
         self.play(FadeOut(explanation))
 
-        explanation = self.explanation(r"Using a \textbf{mini-batch} for each step takes the best of \\ both worlds between using just one sample and all of the \\ data at each step", axes, RIGHT, 2)
+        explanation = self.explanation(r"Using a \textbf{mini-batch} for each step takes the best of \\ both worlds between using just one sample and all of the \\ data at each step", axes, UP, wait=8)
         self.play(FadeOut(VGroup(*arrows)))
-        explanation = self.explanation(r"Similar to using all of the data, uisng a \textbf{mini-batch} \\ can result in more stable estimates of the parameters \\ in fewer steps", axes, RIGHT, 2)
-        explanation = self.explanation(r"and like using just one sample per step, using a \textbf{mini-batch} \\ is much faster than using all of the data", axes, RIGHT, 2)
+        explanation = self.explanation(r"Similar to using all of the data, using a \textbf{mini-batch} \\ can result in more stable estimates of the parameters \\ in fewer steps", axes, UP, wait=7)
+        explanation = self.explanation(r"and like using just one sample per step, using a \textbf{mini-batch} \\ is much faster than using all of the data", axes, UP, wait=7)
         
-        graph = self.graph(axes, "0.68*x + 0.86", title="RSS")
+        intercept = 0.414
+        slope = 0.9082
+        graph = self.graph(axes, f"{slope}*x + {intercept}", title="RSS")
         self.play(Write(graph[0]))
-        explanation = self.explanation(r"In this example, using \textbf{3} samples per step we ended up with \\ the \textbf{intercept = 0.86} and the \textbf{slope = 0.68}", axes, RIGHT, 2)
-        explanation = self.explanation(r"Which means that the estimate for the intercept was just little closer \\ to the gold standard, \textbf{0.87}, then when we \\ used one sample and got \textbf{0.85}", axes, RIGHT, 2)
+        explanation = self.explanation(r"In this example, using \textbf{3} samples per step we ended up with \\ the \textbf{intercept = 0.86} and the \textbf{slope = 0.68}", axes, UP, wait=9)
+        explanation = self.explanation(r"Which means that the estimate for the intercept was just little closer \\ to the gold standard, \textbf{0.87}, then when we \\ used one sample and got \textbf{0.85}", axes, UP, wait=10)
 
         #* new data point
         newDot = self.dot2(axes, 2, 2.5)
         newDot.set_color(WHITE)
         self.play(Write(newDot))
-        explanation = self.explanation(r"One cool thing about \textbf{Stochastic Gradient Descent} is \\ that when we get new data...", axes, RIGHT, 2)
+        explanation = self.explanation(r"One cool thing about \textbf{Stochastic Gradient Descent} is \\ that when we get new data...", axes, UP, wait=5)
         newDot.set_color(YELLOW)
         self.play(Write(newDot))
-        explanation = self.explanation(r"...we can easily use it to take another step for the parameter \\ estimates without having to start from scratch", axes, RIGHT, 2)
-        explanation = self.explanation(r"In other words, we don't have to go all the way back to the \\ initial guesses for the \textbf{slope} and \textbf{intercept} and redo everything", axes, RIGHT, 2)
+        explanation = self.explanation(r"...we can easily use it to take another step for the parameter \\ estimates without having to start from scratch", axes, UP, wait=5)
+        explanation = self.explanation(r"In other words, we don't have to go all the way back to the \\ initial guesses for the \textbf{slope} and \textbf{intercept} and redo everything", axes, UP, wait=8)
         originStraight = self.graph(axes, "1*x", title="")
         self.play(FadeOut(graph[0]), Write(originStraight[0]))
         self.wait(2)
         self.play(FadeOut(originStraight[0]), FadeIn(graph[0]))
-        explanation = self.explanation(r"Instead, we pick up right where we let off and take \\ one more step using the new sample", axes, RIGHT, 2)
+        explanation = self.explanation(r"Instead, we pick up right where we let off and take \\ one more step using the new sample", axes, RIGHT, wait=5)
+
+
+        # New data point
+        partialSlope1, partialSlope2, totalResultSlope = self.partialDerivative([(2, 2.5)], 0.414, 0.9082, axes, "slope", next_to=axes)
+        self.wait(2)
+        partialIntercept1, partialIntercept2, totalResultIntercept = self.partialDerivative([(2, 2.5)], 0.414, 0.9082, axes, "intercept", next_to=partialSlope1)
+        self.wait(2)
+        
+
+        stepSizeSlope = self.equation(result=r"stepSize_{Slope}", next_to=partialIntercept1, next_to_direction=DOWN, left=-1)
+        stepSizeSlope2 = self.equation(result = r"= \dfrac{\partial RSS}{\partial slope} \cdot learningRate", next_to=stepSizeSlope, next_to_direction=RIGHT)
+        self.play(Write(stepSizeSlope))
+        self.play(Write(stepSizeSlope2))
+
+        learningRate = 0.01
+        stepSizeSlope3 = self.equation(rf"= {totalResultSlope} \cdot {learningRate}", next_to=stepSizeSlope2, next_to_direction=DOWN, align_to=stepSizeSlope2, align_to_direction=LEFT)
+        self.play(Write(stepSizeSlope3))
+
+        stepSizeSlopeValue  = totalResultSlope * learningRate
+        stepSizeSlope4 = self.equation(result=rf"= {stepSizeSlopeValue}", next_to=stepSizeSlope2, next_to_direction=DOWN, align_to=stepSizeSlope2, align_to_direction=LEFT)
+        self.play(FadeTransform(stepSizeSlope3, stepSizeSlope4))
+        self.play(FadeOut(stepSizeSlope2))
+        self.play(stepSizeSlope4.animate.next_to(stepSizeSlope, RIGHT))
+
+
+        stepSizeIntercept = r"stepSize_{intercept}"
+        stepSizeIntercept = self.equation(result=r"{stepSizeIntercept}", next_to=stepSizeSlope, next_to_direction=DOWN, left=0.3, up=-0.5)
+        stepSizeIntercept2 = self.equation(result=r"= \dfrac{\partial RSS}{\partial intercept} \cdot learningRate", next_to=stepSizeIntercept, next_to_direction=RIGHT)
+        self.play(Write(stepSizeIntercept))
+        self.play(Write(stepSizeIntercept2))
+        
+        learningRate = 0.01
+        stepSizeIntercept3 = self.equation(result=rf"= {totalResultIntercept} \cdot {learningRate}", next_to=stepSizeIntercept2, next_to_direction=DOWN, align_to=stepSizeIntercept2, align_to_direction=LEFT)
+        self.play(Write(stepSizeIntercept3))
+
+        stepSizeInterceptValue = totalResultIntercept * learningRate
+        stepSizeIntercept4 = self.equation(result=rf"= {stepSizeInterceptValue}", next_to=stepSizeIntercept2, next_to_direction=DOWN, align_to=stepSizeIntercept2, align_to_direction=LEFT)
+        self.play(FadeTransform(stepSizeIntercept3, stepSizeIntercept4))
+        self.play(FadeOut(stepSizeIntercept2))
+        self.play(stepSizeIntercept4.animate.next_to(stepSizeIntercept, RIGHT))
+        stepsize = [stepSizeSlope, stepSizeSlope4, stepSizeIntercept, stepSizeIntercept4]
+        stepsize = VGroup(*stepsize)
+
+        slopeGroup = VGroup(partialSlope1, partialSlope2)
+        interceptGroup = VGroup(partialIntercept1, partialIntercept2)
+        # New slopes and intercepts
+        self.play(FadeOut(slopeGroup), FadeOut(interceptGroup))
+        self.play(stepsize.animate.shift(UP*2))
+
+        newSlope1 = self.equation(result=r"slope_{new}",next_to=stepSizeIntercept, next_to_direction=DOWN, left=-2)
+        newSlope2 = self.equation(result=r"= slope_{old} - stepSize_{slope}", next_to=newSlope1, next_to_direction=RIGHT)
+        self.play(Write(newSlope1))
+        self.play(Write(newSlope2))
+        newSlope3 = self.equation(result=rf"= {slope} - ({stepSizeSlopeValue})", next_to=newSlope2, next_to_direction=DOWN, align_to=newSlope2, align_to_direction=LEFT)
+        self.play(Write(newSlope3))
+        newSlopeValue = slope - stepSizeSlopeValue
+        newSlope4 = self.equation(result=rf"= {newSlopeValue}", next_to=newSlope2, next_to_direction=DOWN, align_to=newSlope2, align_to_direction=LEFT)
+        self.play(FadeTransform(newSlope3, newSlope4))
+        self.play(FadeOut(newSlope2))
+        self.play(newSlope4.animate.next_to(newSlope1, RIGHT))
+
+        
+        
+        newintercept1 = self.equation(result=r"intercept_{new}", next_to=newSlope1, next_to_direction=DOWN)
+        newintercept2 = self.equation(result=r"= intercept_{old} - stepSize_{intercept}", next_to=newintercept1, next_to_direction=RIGHT)
+        self.play(Write(newintercept1))
+        self.play(Write(newintercept2))
+
+        newintercept3 = self.equation(result=rf"= {intercept} - ({stepSizeInterceptValue})", next_to=newintercept2, next_to_direction=DOWN, align_to=newintercept2, align_to_direction=LEFT)
+        self.play(Write(newintercept3))
+        newinterceptValue = intercept - stepSizeInterceptValue
+        newintercept4 = self.equation(result=rf"= {newinterceptValue}", next_to=newintercept2, next_to_direction=DOWN, align_to=newintercept2, align_to_direction=LEFT)
+        self.play(FadeTransform(newintercept3, newintercept4))
+        self.play(FadeOut(newintercept2))
+        self.play(newintercept4.animate.next_to(newintercept1, RIGHT))
 
     def construct(self):
         self.miniBatch()
