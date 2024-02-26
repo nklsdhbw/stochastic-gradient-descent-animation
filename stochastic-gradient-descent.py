@@ -7,7 +7,7 @@ class Visualize(Scene):
         #* Why SGD?
         why_sgd = Tex(r"Why Stochastic Gradient Descent?", color=WHITE)
         self.play(Create(why_sgd))
-        self.wait(1)
+        self.wait(2)
         self.play(FadeOut(why_sgd))
     
     def explain_sgd(self):
@@ -17,11 +17,11 @@ class Visualize(Scene):
 
         VGroup(set1, set2, set3).arrange(DOWN)
         self.play(Write(set1))
-        self.wait(2)
+        self.wait(8)
         self.play(FadeIn(set2, shift=DOWN))
-        self.wait(2)
+        self.wait(4)
         self.play(FadeIn(set3, shift=DOWN))
-        self.wait(2)
+        self.wait(3)
         self.play(FadeOut(set1), FadeOut(set2), FadeOut(set3))
         self.wait(1)
         set4 = Tex(r"Then we would have to calculate 1,000,000 terms for each of the 23,000 derivatives.").scale(0.8)
@@ -29,20 +29,20 @@ class Visualize(Scene):
         set6 = Tex(r"And since it is common to take at least 1,000 steps, we would calculate at least 2,300,000,000,000 terms.").scale(0.8) 
         VGroup(set4, set5, set6).arrange(DOWN)
         self.play(Write(set4))
-        self.wait(2)
+        self.wait(5)
         self.play(FadeIn(set5, shift=DOWN))
-        self.wait(2)
+        self.wait(5)
         self.play(FadeIn(set6, shift=DOWN))
-        self.wait(2)
+        self.wait(6)
         self.play(FadeOut(set4), FadeOut(set5), FadeOut(set6))
         self.wait(1)
         set7 = Tex(r"So, for BIG DATA, Gradient Descent is slow.").scale(0.8)
         set8 = Tex(r"This is where Stochastic Gradient Descent comes in handy.").scale(0.8)
         VGroup(set7, set8).arrange(DOWN)
         self.play(Write(set7))
-        self.wait(2)
+        self.wait(3)
         self.play(FadeIn(set8, shift=DOWN))
-        self.wait(2)
+        self.wait(3)
         self.play(FadeOut(set7), FadeOut(set8))
         self.wait(1)
 
@@ -123,7 +123,7 @@ class Visualize(Scene):
         # Create explanatory text
         explanation = Tex(r"Stochastic Gradient Descent would randomly pick one sample for each step…", color=WHITE).scale(0.5)
         explanation.next_to(arrow.get_start(), UP, buff=0.1)
-
+        self.wait(5)
         # Add the arrow and text to the scene
         self.play(GrowArrow(arrow), Write(explanation))
         self.wait(2)
@@ -133,7 +133,7 @@ class Visualize(Scene):
         explanation2.next_to(arrow.get_start(), UP, buff=0.1)
         self.play(FadeOut(explanation))
         self.play(Write(explanation2))
-        self.wait(2)
+        self.wait(3)
         self.play(FadeOut(explanation2), FadeOut(arrow))
 
         # Create the derivative equation parts
@@ -228,7 +228,7 @@ class Visualize(Scene):
             GrowArrow(arrow3),  # Grow the third arrow
             Write(explanation),  # Write the explanation text
             )
-        self.wait(2)
+        self.wait(8)
         self.play(FadeOut(explanation))
         equation_part1.set_color(GREY)
         equation_part2.set_color(GREY)
@@ -243,7 +243,7 @@ class Visualize(Scene):
         explanation = Tex(r"If we had 1,000,000 samples, then Stochastic Gradient Descent would reduce the amount terms computed by a factor of 1,000,000.", color=WHITE).scale(0.5)
         explanation.next_to(arrow.get_start(), UP, buff=0.1)
         self.play(Write(explanation))
-        self.wait(2)
+        self.wait(7)
         self.play(FadeOut(dots), FadeOut(title), FadeOut(x_label), FadeOut(y_label), FadeOut(axes), FadeOut(dot),FadeOut(arrow), FadeOut(explanation), FadeOut(arrow2), FadeOut(arrow3), FadeOut(equation_part1), FadeOut(equation_part2), FadeOut(equation_part3), FadeOut(equation_part4))
 
     def example2(self):
@@ -273,13 +273,13 @@ class Visualize(Scene):
         explanation = Tex(r"Stochastic Gradient Descent is especially useful when there are redundancies in the data.", color=WHITE).scale(0.5)
         explanation.next_to(axes, UP * 8, buff=0.1)
         self.play(Write(explanation))
-        self.wait(2)
+        self.wait(6)
         self.play(FadeOut(explanation))
         self.wait(1)
         explanation = Tex(r"For example, we have 12 data points, but there is a lot of redundancy that forms 3 clusters.", color=WHITE).scale(0.5)
         explanation.next_to(axes, UP * 8, buff=0.1)
         self.play(Write(explanation))
-        self.wait(2)
+        self.wait(6)
         dot1 = dots[0]
         dot3 = dots[4]
         dot5 = dots[8]
@@ -296,6 +296,7 @@ class Visualize(Scene):
         explanation = Tex(r"So we start with a line with the intercept = 0 and the slope = 1…", color=WHITE).scale(0.5)
         explanation.next_to(axes, UP * 8, buff=0.1)
         self.play(Write(explanation))
+        self.wait(4)
         intercept = 0
         slope = 1
         # Linie mit intercept = 0 und slope = 1 zeichnen
@@ -313,7 +314,7 @@ class Visualize(Scene):
         explanation = Tex(r"...and use that point to calculate Hight=4,2, Weight=4,6, Intercept=0, Slope=1", color=WHITE).scale(0.5)
         explanation.next_to(axes, UP * 8, buff=0.1)
         self.play(Write(explanation))
-
+        self.wait(7)
         
 
         # Create the derivative equation parts
@@ -367,7 +368,7 @@ class Visualize(Scene):
         explanation = Tex(r"Plug in the Slopes and the Learning Rate", color=WHITE).scale(0.5)
         explanation.next_to(axes, UP * 8, buff=0.1)
         self.play(Write(explanation))
-
+        self.wait(2)
         # Create the derivative equation parts
         equation_part5 = MathTex(
             r"\text{Step Size}_{\text{Intercept}} = \text{Slope} \times \text{Learning Rate}",
@@ -393,27 +394,28 @@ class Visualize(Scene):
         explanation = Tex(r"Just like with regular Gradient Descent, Stochastic Gradient Descent is sensitive to the value you choose for the Learning Rate...", color=WHITE).scale(0.5)
         explanation.next_to(axes, UP * 8, buff=0.1)
         self.play(Write(explanation))
-        self.wait(2)
+        self.wait(8)
         self.play(FadeOut(explanation))
         explanation = Tex(r"...and just like for regular Gradient Descent, the general strategy is to start with a relatively large Learning Rate and make it smaller with each step...", color=WHITE).scale(0.5)
         explanation.next_to(axes, UP * 8, buff=0.1)
         self.play(Write(explanation))
-        self.wait(2)
+        self.wait(10)
         self.play(FadeOut(explanation))
         explanation = Tex(r"...and lastly, just like for regular Gradient Descent, many implementations of Stochastic Gradient Descent will take care of this for you by default.", color=WHITE).scale(0.5)
         explanation.next_to(axes, UP * 8, buff=0.1)
         self.play(Write(explanation))
-        self.wait(2)
+        self.wait(8)
         self.play(FadeOut(explanation))
         explanation = Tex(r"In this simple example, however, we'll just setting the Learning Rate to 0.01.", color=WHITE).scale(0.5)
         explanation.next_to(axes, UP * 8, buff=0.1)
         self.play(Write(explanation))
-        self.wait(4)
+        self.wait(5)
         self.play(FadeOut(explanation))
         self.play(FadeOut(equation_part1), FadeOut(equation_part2), FadeOut(equation_part3), FadeOut(equation_part4), FadeOut(equation_part5), FadeOut(equation_part6))
         explanation = Tex(r"…calculate the new intercept…", color=WHITE).scale(0.5)
         explanation.next_to(axes, UP * 8, buff=0.1)
         self.play(Write(explanation))
+        self.wait(2)
 
         # New Intersect
         equation_part1 = MathTex(
@@ -457,14 +459,21 @@ class Visualize(Scene):
         # 1.2,2.1
         self.wait(2)
         self.play(FadeOut(explanation))
+        self.play(FadeOut(prediction_line))
         explanation = Tex(r"and we just repeat everything a bunch of times...", color=WHITE).scale(0.5)
         explanation.next_to(axes, UP * 8, buff=0.1)
         self.play(Write(explanation))
+        self.wait(3)
         FadeOut(prediction_line1)
-        self.sgd_visualization(axes, dots)
-        
-        
-
+        self.play(FadeOut(prediction_line1))
+        line = self.sgd_visualization(axes, dots)
+        self.play(FadeOut(explanation))
+        explanation = Tex(r"until we get the best fitting line", color=WHITE).scale(0.5)
+        explanation.next_to(axes, UP * 8, buff=0.1)
+        self.play(Write(explanation))
+        self.wait(2)
+        self.play(FadeOut(dots), FadeOut(title), FadeOut(x_label), FadeOut(y_label), FadeOut(axes), FadeOut(explanation))
+        self.play(FadeOut(line))
     def sgd_visualization(self, axes, dots):
         learning_rate = 0.01
         intercept = 0
@@ -478,9 +487,10 @@ class Visualize(Scene):
             if i < num_iterations - 1:
                 line = self.draw_line(axes, intercept, slope, color="BLUE")
                 self.play(FadeOut(line))  # Add a fade-out animation
-                
+
+
         # Draw the perfect line in red
-        self.draw_line(axes, intercept, slope, color="RED")
+        return self.draw_line(axes, intercept, slope, color="RED")
 
 
     def update_parameters(self, x, y, intercept, slope, learning_rate):
